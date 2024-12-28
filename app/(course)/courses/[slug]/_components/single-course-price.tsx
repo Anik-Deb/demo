@@ -1,39 +1,23 @@
 // @ts-nocheck
 
-"use client";
-import { useState } from "react";
 import CheckoutButton from "@/components/checkoutButton/checkoutButton";
 import { Label } from "@/components/ui/label";
 import { RadioGroupItem } from "@/components/ui/radio-group";
-import { RadioGroup } from "@radix-ui/react-radio-group";
+import { RadioGroup } from "@/components/ui/radio-group";
 import moment from "moment";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { db } from "@/lib/db";
 
-export default function SingleCoursePrice({ course, access, userId }) {
-  const [selectedPrice, setSelectedPrice] = useState(course.prices[0].id);
-
-  const handleValueChange = (value) => {
-    setSelectedPrice(value); // Update selected price in state
-  };
-
+const SingleCoursePrice = async ({ course, userId }) => {
   const isDiscountExpired = (expiresAt) => {
     const currentDate = new Date();
     const discountExpiryDate = new Date(expiresAt);
     return currentDate.getTime() > discountExpiryDate.getTime();
   };
-
-  const { slug } = course;
-
-  const decodedSlug = course.lessons[0]?.slug
-    ? decodeURIComponent(course.lessons[0].slug)
-    : "";
-  // console.log("userid", userId);
-
+console.log("single course price");
   return (
     <>
       <div>
-        <RadioGroup onValueChange={handleValueChange} value={selectedPrice}>
+        <RadioGroup defaultValue={course.prices[0].id}>
           {course.prices.map((price) => (
             <div
               key={price.id}
@@ -47,15 +31,11 @@ export default function SingleCoursePrice({ course, access, userId }) {
                 >
                   {price?.isFree ? (
                     <div className="flex gap-1 items-center">
-                      <div className="flex gap-1 items-center">
-                        <span>Free</span>
-                      </div>
+                      <span>Free</span>
                     </div>
                   ) : (
                     <div className="flex gap-1 items-center">
-                      <div className="flex gap-1 items-center">
-                        <span>৳ {price.regularAmount}</span>
-                      </div>
+                      <span>৳ {price.regularAmount}</span>
                       <span className="text-sm text-gray-500">
                         {" / "}
                         {price.frequency.toLowerCase()}
@@ -69,12 +49,10 @@ export default function SingleCoursePrice({ course, access, userId }) {
                   htmlFor={price.id}
                 >
                   <div className="flex gap-1 items-center">
-                    <div className="flex gap-1 items-center">
-                      <span>৳ {price.discountedAmount}</span>
-                      <span className="text-sm text-gray-500 line-through">
-                        {price.regularAmount}
-                      </span>
-                    </div>
+                    <span>৳ {price.discountedAmount}</span>
+                    <span className="text-sm text-gray-500 line-through">
+                      {price.regularAmount}
+                    </span>
                     <span className="text-sm text-gray-500">
                       {" / "}
                       {price.frequency.toLowerCase()}
@@ -92,12 +70,11 @@ export default function SingleCoursePrice({ course, access, userId }) {
           ))}
         </RadioGroup>
 
-        {/* TODO: Add a checkbox with agreement of terms condition and privacy policy and enable checkout button if checked */}
         <CheckoutButton
           userId={userId}
           courseId={course.id}
-          priceId={selectedPrice}
-          checked={true} // TODO: checked comes from - agree to privacy policy and terms condition
+          priceId={course.prices[0].id} // Use default price
+          checked={true} // TODO: Pass actual checkbox state
         />
       </div>
 
@@ -109,4 +86,32 @@ export default function SingleCoursePrice({ course, access, userId }) {
       </p>
     </>
   );
+};
+
+export default SingleCoursePrice;
+
+export async function getServerSideProps(context) {
+  const { courseId } = context.params; // Assumes a route like `/course/[courseId]`
+  const userId = context.req.session?.user?.id || null; // Get user from session
+
+  // Fetch course details from the database
+  const course = await db.course.findUnique({
+    where: { id: courseId },
+    include: {
+      prices: true,
+    },
+  });
+
+  if (!course) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    props: {
+      course,
+      userId,
+    },
+  };
 }

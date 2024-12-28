@@ -1,6 +1,4 @@
 // @ts-nocheck
-
-// @ts-nocheck
 import { Button } from "@/components/ui/button";
 import { convertNumberToBangla } from "@/lib/convertNumberToBangla";
 import Image from "next/image";

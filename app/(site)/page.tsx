@@ -1,13 +1,10 @@
 // @ts-nocheck
-
-import { getServerUserSession } from "@/lib/getServerUserSession";
+// import { getServerUserSession } from "@/lib/getServerUserSession";
 import Courses from "./_components/home/Courses";
 import PrayogikHero from "./_components/home/PrayogikHero";
 import Testimonials from "./_components/home/Testimonials";
 import WhyChoose from "./_components/home/WhyChoose";
-import { Suspense } from "react";
 import FeaturedCourses from "./_components/home/FeaturedCourses";
-import SkeletonCard from "@/components/SkeletonCard";
 
 // export const revalidate = 3600; // invalidate every hour
 // request comes in, at most once every 60 seconds.
@@ -69,8 +66,6 @@ import SkeletonCard from "@/components/SkeletonCard";
 //   }
 // };
 
-
-
 export default async function Page() {
   // const { userId } = await getServerUserSession();
   // const courses = await getHomeCourses(userId);
@@ -79,9 +74,7 @@ export default async function Page() {
     <div>
       <PrayogikHero />
       {/* <Courses courses={courses} /> */}
-      <Suspense fallback={<SkeletonCard />}>
-        <FeaturedCourses />
-      </Suspense>
+      <FeaturedCourses />
       <Testimonials />
       {/* <WhyChoose /> */}
     </div>

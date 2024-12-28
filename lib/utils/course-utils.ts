@@ -9,7 +9,7 @@ export const checkCourseAccess = async (courseSlug: string, userId: number) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ courseSlug, userId }),
-      cache: "no-store", // Prevent caching for sensitive data
+      cache: "force-cache", // Prevent caching for sensitive data
     });
 
     if (!response.ok) {
@@ -47,7 +47,7 @@ export const getCourseBySlug = async (courseSlug: string, userId?: number) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
-      cache: "no-store", // Prevent caching for sensitive data
+      cache: "force-cache", // Prevent caching for sensitive data
     });
 
     if (!response.ok) {
