@@ -58,7 +58,7 @@ const checkCourseAccess = async (courseSlug, userId) => {
     };
   }
 };
-
+console.log("lesson slug");
 // Lesson page component
 export default async function LessonPage({ params }) {
   const { userId } = await getServerUserSession();

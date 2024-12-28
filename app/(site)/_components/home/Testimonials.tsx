@@ -1,7 +1,3 @@
-"use client";
-import React, { Component } from "react";
-import Image from "next/image";
-import { Card, CardContent } from "@/components/ui/card";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import CarouselSlider from "@/components/CarouselSlider";
@@ -52,18 +48,18 @@ const testimonials = [
   },
 ];
 
-export default class Testimonials extends Component {
-  render() {
-    return (
-      <div>
-        <div className="bg-black">
-          <div className="mx-auto max-w-7xl px-6 lg:px-8 py-24 overflow-hidden">
-            <div className="mx-auto max-w-none sm:max-w-lg text-center mt-2  text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              <p>প্রায়োগিকের উদ্যোগ সম্পর্কে</p>
-              <p className="text-primary-400">
-                মার্কেটিং ইন্ড্রাস্ট্রি এক্সপার্টদের মতামত
-              </p>
-            </div>
+const Testimonials = () => {
+  return (
+    <div>
+      <div className="bg-black">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8 py-24 overflow-hidden">
+          <div className="mx-auto max-w-none sm:max-w-lg text-center mt-2  text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            <p>প্রায়োগিকের উদ্যোগ সম্পর্কে</p>
+            <p className="text-primary-400">
+              মার্কেটিং ইন্ড্রাস্ট্রি এক্সপার্টদের মতামত
+            </p>
+          </div>
+          <div>
             <CarouselSlider
               slidesToShow={3}
               itemLg={3}
@@ -84,6 +80,7 @@ export default class Testimonials extends Component {
           </div>
         </div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
+export default Testimonials;

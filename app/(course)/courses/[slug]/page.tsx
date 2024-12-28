@@ -37,7 +37,7 @@ export default async function CoursePage({
 
   // Fetch average rating server-side
   const ratingData = await getRating(course.id);
-  console.log("deatils page");
+  console.log("course slug page");
   // Render the Course Page
   return (
     <div>

@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function PrayogikHero() {
   return (
     <div className="grid gap-16">
