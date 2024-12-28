@@ -15,7 +15,7 @@ export default async function CourseLesson({ course }) {
   return (
     <div className="my-6">
       <h1 className="text-2xl font-bold mb-4">Course Lessons</h1>
-      <div type="single" collapsible className="">
+      <div>
         {course.lessons.map((lesson, i) => (
           <div key={lesson.id} value={lesson.id}>
             <div className="p-4 bg-gray-100 mb-3 border">

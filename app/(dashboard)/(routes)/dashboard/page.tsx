@@ -64,7 +64,7 @@ export default async function Dashboard() {
           variant="success"
         />
       </div>
-      <CoursesList items={[...coursesInProgress, ...completedCourses]} />
+      <CoursesList userId={userId} items={[...coursesInProgress, ...completedCourses]} />
     </div>
   );
 }
