@@ -22,7 +22,7 @@ export async function getCourseData(slug: string) {
 
     // Fetch course details by slug
     course = await getCourseBySlug(slug, userId);
-
+    
     // Fetch related courses if the user is authenticated and course exists
     if (userId && course) {
       relatedCourses = await getRelatedCourses({
