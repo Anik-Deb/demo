@@ -76,11 +76,11 @@ const FeaturedCourses = async () => {
                 </div>
               ) : (
                 <div className="mx-auto mt-16 grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-                  <Suspense fallback={<SkeletonCard />}>
+                 
                     {courses.map((course, i) => (
                       <SingleCourse userId={userId} course={course} key={i} />
                     ))}
-                  </Suspense>
+                  
                 </div>
               )}
               {courses.length > 4 && (

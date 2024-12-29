@@ -18,7 +18,7 @@ export default function Loading() {
           fill="currentColor"
         />
       </svg>
-      <p className="text-gray-500">course slug loading...</p>
+      <p className="text-gray-500">loading...</p>
     </div>
   );
 }
