@@ -2,10 +2,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 
-export default function Testimonial({ item, key }) {
+export default function Testimonial({ item }) {
   return (
     <Card
-      key={key}
+      
       className="px-5 py-4 rounded-2xl mt-20 bg-gradient-to-t from-[#097568] to-[#01524D] text-white"
     >
       <CardContent className="mt-5">{item.details}</CardContent>

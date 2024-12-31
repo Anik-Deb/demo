@@ -20,6 +20,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader } from "lucide-react";
 
+// Helper function to convert a string to title case
+const toTitleCase = (str: string) => {
+  return str.toLowerCase().replace(/\b(\w)/g, (match) => match.toUpperCase());
+};
+
 // Update the slug validation to require English letters, numbers, and hyphens
 const formSchema = z.object({
   title: z.string().min(1, {
@@ -45,7 +50,15 @@ const CreatePage = () => {
 
   const { isSubmitting, isValid } = form.formState;
 
+  // Function to determine if the string contains only English letters and spaces
+  const isEnglish = (str: string) => /^[a-zA-Z0-9\s]+$/.test(str);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    // Check if title is in English and if so, convert to title case
+    if (isEnglish(values.title)) {
+      values.title = toTitleCase(values.title);
+    }
+
     try {
       const response = await axios.post("/api/courses", values);
       router.push(`/teacher/courses/${response.data.id}`);

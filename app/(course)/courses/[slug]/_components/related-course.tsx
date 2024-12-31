@@ -1,13 +1,15 @@
 // @ts-nocheck
 
+import { Item } from "@radix-ui/react-accordion";
 import { StarFilledIcon } from "@radix-ui/react-icons";
-import { User2, Users2Icon } from "lucide-react";
+import { Play, User2, Users2Icon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function RelatedCourse({ courses }) {
   // const rating = 4.5; // rating comes from database
-  console.log("related course page");
+  // console.log("related course page");
+
   return (
     <div className="my-12">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Related Courses</h1>
@@ -17,69 +19,107 @@ export default function RelatedCourse({ courses }) {
           <p>No related courses found at the moment.</p>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="grid md:grid-cols-1 grid-cols-2 gap-2">
           {courses.map((item, index) => (
             <Link key={index} href={`/courses/${item.slug}`}>
-              <div className="bg-white border hover:shadow border-gray-200 rounded-lg flex items-center p-4 gap-4 transition">
-                <Image
-                  src={item.imageUrl}
-                  alt={`Course ${index + 1}`}
-                  width={120}
-                  height={80}
-                  className="rounded-lg object-cover"
-                  priority={index === 0} // Prioritize the first image for faster loading
-                />
-                <div className="flex-1">
-                  <h2 className="text-lg font-semibold text-gray-800 line-clamp-2">
-                    {item.title}
-                  </h2>
-                  <p className="text-sm text-gray-500 mt-1">
-                    {item.hours || "24 total hours"} • Updated:{" "}
-                    {new Date(item.updatedAt).toLocaleDateString()}
-                  </p>
-                  <div className="flex items-center mt-2 text-yellow-500 text-sm">
-                    {/* {[...Array(Math.round(rating))].map((_, i) => (
+              <div className="bg-white md:min-h-0 min-h-[280px] mb-2 border hover:shadow border-gray-200 rounded-lg flex md:flex-row flex-col md:items-center md:p-2 gap-4 transition justify-between">
+                <div className="flex gap-4 md:flex-row flex-col">
+                  {/* course image */}
+                  <div className="relative w-full md:w-[120px] h-0 pb-[56.25%] md:pb-0 md:h-[80px]">
+                    <Image
+                      src={item.imageUrl}
+                      alt={`Course ${index + 1}`}
+                      fill
+                      className="rounded-lg md:rounded-b-lg rounded-b-none object-cover"
+                      priority={index === 0} // Prioritize the first image for faster loading
+                    />
+                    <div className="absolute flex items-center justify-center transition-all duration-300 hover:bg-[#0000003b] w-full h-full">
+                      <div className="bg-[#727374ab] p-2 rounded-full">
+                        <Play className="text-white rounded-full" size={14} />
+                      </div>
+                    </div>
+                  </div>
+                  {/* course title */}
+                  <div className="md:flex-1 md:p-0 px-2">
+                    <h2 className="md:text-lg text-base hover:text-teal-700 font-semibold capitalize text-gray-800">
+                      {item.title}
+                    </h2>
+                    <p className="text-sm text-gray-500 mt-1 flex md:flex-row flex-col">
+                      {item.totalDuration && (
+                        <>
+                          <span className="text-teal-700 text-sm">
+                            {item.totalDuration} hour long
+                          </span>
+                          <span className="mx-2 text-gray-400 hidden lg:block">
+                            •
+                          </span>
+                        </>
+                      )}
+                      <span className="md:text-sm text-xs">
+                        Last updated on:
+                        {new Date(item.updatedAt).toLocaleDateString()}
+                      </span>
+                    </p>
+                    <div className="flex items-center mt-2 text-yellow-500 text-sm">
+                      {/* {[...Array(Math.round(rating))].map((_, i) => (
                       <StarFilledIcon key={i} />
                     ))} */}
-                    {courses?.rating?.map((_, i) => (
-                      <StarFilledIcon key={i} />
-                    ))}
-                    <span className="ml-2 text-gray-600">
-                      {courses?.rating?.toFixed(1)}
-                    </span>
+                      {courses?.rating?.map((_, i) => (
+                        <StarFilledIcon key={i} />
+                      ))}
+                      <span className="ml-2 text-gray-600">
+                        {courses?.rating?.toFixed(1)}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <div className="text-right">
+                {/* course price */}
+                <div className="md:text-right text-left md:px-0 px-2 pt-0">
                   {item.prices.length > 0 ? (
                     <>
-                      <div className="text-lg font-bold text-gray-800">
-                        Discount Price: $
-                        {item.prices[0].discountedAmount ||
-                          item.prices[0].regularAmount}
-                      </div>
-                      {item.prices[0].discountedAmount && (
-                        <div className="text-sm  text-gray-400">
-                          Regular price:
-                          <span className="line-through">
-                            {" "}
-                            ${item.prices[0].regularAmount}
-                          </span>
+                      {item?.prices[0]?.isFree ? (
+                        <div className="text-sm text-gray-800 pb-2 md:pb-0">
+                          <span>Free</span>
                         </div>
-                      )}
-                      {item.prices[0].discountExpiresOn && (
-                        <div className="text-sm text-red-500 mt-2">
-                          Discount expires on:{" "}
-                          {new Date(
-                            item.prices[0].discountExpiresOn
-                          ).toLocaleDateString()}
+                      ) : (
+                        <div>
+                          {item.prices[0].discountedAmount ? (
+                            <div className="flex md:flex-col flex-col-reverse md:items-end md:justify-between justify-start">
+                              <div className="font-bold text-gray-800 pb-2 md:pb-0">
+                                <span className="md:text-lg mr-2">
+                                  ৳{item.prices[0].discountedAmount}
+                                </span>
+                                <span
+                                  className={`text-sm text-gray-500 ${
+                                    item.prices[0].discountedAmount
+                                      ? "line-through"
+                                      : ""
+                                  }`}
+                                >
+                                  ৳{item.prices[0].regularAmount}
+                                </span>
+                              </div>
+
+                              <div className="md:text-sm text-xs text-red-600 capitalize">
+                                <span>Offer Expires on:</span>
+                                <span>
+                                  {new Date(
+                                    item.prices[0].discountExpiresOn
+                                  ).toLocaleDateString()}
+                                </span>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="font-bold text-gray-800">
+                              <span className="text-lg ml-2">
+                                ৳{item.prices[0].regularAmount}
+                              </span>
+                            </div>
+                          )}
                         </div>
                       )}
                     </>
-                  ) : (
-                    <div className="text-sm text-gray-500">
-                      Price not available
-                    </div>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </Link>

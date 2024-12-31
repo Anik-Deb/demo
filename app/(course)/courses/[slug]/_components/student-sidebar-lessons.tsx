@@ -1,5 +1,6 @@
-//  @ts-nocheck
+// @ts-nocheck
 "use client";
+
 import { useState } from "react";
 import { FileTextIcon, PlayCircleIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -11,9 +12,11 @@ const StudentSidebarLessons = ({
   courseSlug,
   index,
   videoUrl,
+  isLast, // Receive isLast prop
 }) => {
   const [activeVideoUrl, setActiveVideoUrl] = useState(videoUrl);
   const router = useRouter();
+
   const handlePlayClick = (item) => {
     // Update the active video URL
     setActiveVideoUrl(item?.videoUrl);
@@ -22,12 +25,15 @@ const StudentSidebarLessons = ({
     // Push the new lesson route
     router.push(`/courses/${courseSlug}/${item?.slug}`);
   };
+
   return (
     <div className="bg-white">
       <div
-        className={`cursor-pointer flex items-start gap-2 py-3 rounded-md transition-all border-b border-gray-100 ${
+        className={`cursor-pointer flex items-start gap-2 py-3 rounded-md transition-all ${
+          !isLast ? "border-b border-gray-100" : "" // Conditionally apply border
+        } ${
           item.slug === lessonSlug
-            ? "text-green-500 font-semibold"
+            ? "text-teal-700 font-semibold"
             : "text-gray-600"
         }`}
         onClick={() => handlePlayClick(item)}
@@ -35,16 +41,17 @@ const StudentSidebarLessons = ({
         {item.videoUrl !== null ? (
           <PlayCircleIcon
             className={`w-5 h-5 min-w-[20px] ${
-              item.slug === lessonSlug ? "text-green-500" : "text-gray-500"
+              item.slug === lessonSlug ? "text-teal-500" : "text-gray-500"
             }`}
           />
         ) : (
           <FileTextIcon
             className={`w-5 h-5 min-w-[20px] ${
-              item.slug === lessonSlug ? "text-green-500" : "text-gray-500"
+              item.slug === lessonSlug ? "text-teal-500" : "text-gray-500"
             }`}
           />
         )}
+
         <div className="text-sm flex gap-2">
           <span className="min-w-max text-nowrap">Lesson {index + 1}:</span>
           <p
@@ -58,4 +65,5 @@ const StudentSidebarLessons = ({
     </div>
   );
 };
+
 export default StudentSidebarLessons;

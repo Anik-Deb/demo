@@ -1,12 +1,11 @@
 // @ts-nocheck
-
-"use client"; // Mark as a client component
+"use client";
 
 import { useEffect, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "react-hot-toast";
 
-const NotificationHandler = () => {
+const NotificationHandler = ({ message }) => {
   const searchParams = useSearchParams();
   const success = searchParams.get("success");
   const canceled = searchParams.get("canceled");
@@ -15,15 +14,17 @@ const NotificationHandler = () => {
   // Ref to track if the toast has already been shown
   const toastShown = useRef(false);
 
+  // console.log("success", success);
+
   useEffect(() => {
-    if (success === "1" && !toastShown.current) {
-      toast.success("Course purchase completed successfully");
+    if (success && !toastShown.current) {
+      toast.success(message); 
       toastShown.current = true; // Mark as shown
-    } else if (canceled === "1" && !toastShown.current) {
-      toast.error("Course purchase canceled");
+    } else if (canceled && !toastShown.current) {
+      toast.error(message);
       toastShown.current = true; // Mark as shown
-    } else if (failed === "1" && !toastShown.current) {
-      toast.error("Course purchase failed");
+    } else if (failed && !toastShown.current) {
+      toast.error(message);
       toastShown.current = true; // Mark as shown
     }
   }, [success, canceled, failed]); // Add dependencies

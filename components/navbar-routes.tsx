@@ -9,13 +9,10 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { SearchInput } from "./search-input";
 import UserProfileMenus from "./userProfileMenus";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-
-
-// important to fix role switch not updating issue 
+// important to fix role switch not updating issue
 export const dynamic = "force-dynamic";
-
 
 export const NavbarRoutes = () => {
   const { data: session, status } = useSession();
@@ -41,7 +38,7 @@ export const NavbarRoutes = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ role: newRole }), 
+        body: JSON.stringify({ role: newRole }),
       });
 
       if (!response.ok) {
@@ -96,7 +93,7 @@ export const NavbarRoutes = () => {
             onClick={() => handleSwitchRole("TEACHER")}
             disabled={loading}
           >
-            <Button size="sm" variant="outline">
+            <Button size="sm" variant="outline" className="text-nowrap">
               {loading ? (
                 <Loader className="animate-spin h-4 w-4" />
               ) : (

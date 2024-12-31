@@ -62,10 +62,10 @@ const Testimonials = () => {
           <div>
             <CarouselSlider
               slidesToShow={3}
+              slidesToScroll={1}
               itemLg={3}
               itemMd={2}
               itemSm={1}
-              slidesToScroll={1}
               scrollLg={1}
               scrollMd={1}
               scrollSm={1}

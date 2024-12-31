@@ -70,10 +70,8 @@ const ChapterIdPage = async ({
           />
         </div>
         <div>
-          <div className="p-4 flex flex-col md:flex-row md:gap-x-4 items-start justify-between">
-            <h2 className="text-2xl font-semibold mb-2 flex-1">
-              {chapter.title}
-            </h2>
+          <div className="p-4 flex flex-row flex-wrap gap-x-4 items-center justify-between">
+            <h2 className="text-2xl font-semibold mb-2 ">{chapter.title}</h2>
             {purchase ? (
               <CourseProgressButton
                 chapterId={params.chapterId}

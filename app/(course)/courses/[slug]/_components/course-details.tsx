@@ -8,9 +8,9 @@ import { FileIcon, CodeIcon } from "lucide-react";
 // This card presents course features, with icons and text aligned
 const CourseInclusions = ({ course }) => {
   let courseDuration = course?.totalDuration / 60;
-  console.log("includes page");
+  // console.log("includes page");
   return (
-    <>
+    <div className="md:py-4 pt-6">
       {courseDuration !== 0 && (
         <Card className="p-0 border-none shadow-none">
           <CardContent className="flex items-start p-0">
@@ -53,7 +53,7 @@ const CourseInclusions = ({ course }) => {
           </CardContent>
         </Card>
       )}
-    </>
+    </div>
   );
 };
 

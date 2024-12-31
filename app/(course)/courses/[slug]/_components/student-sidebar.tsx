@@ -28,6 +28,7 @@ export default function StudentSidebar({
           onVideoUrlUpdate={onVideoUrlUpdate}
           courseSlug={courseSlug}
           videoUrl={videoUrl}
+          isLast={index === lesson.length - 1}
         />
       ))}
     </div>

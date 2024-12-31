@@ -22,38 +22,39 @@ export const getRelatedCourses = async ({
   limit = 4,
 }: GetRelatedCoursesParams): Promise<CourseWithCategory[]> => {
   try {
-    // Step 1: Fetch IDs of purchased courses by the user if userId exists
-    let purchasedCourseIds: string[] = [];
+    // Initialize an array for purchased course IDs
+    let purchasedCourseIds: string[] = []; // Step 1: Fetch IDs of purchased courses by the user if userId exists
+
     if (userId) {
       const purchasedCourses = await db.purchase.findMany({
         where: { userId },
         select: { courseId: true },
       });
+
       purchasedCourseIds = purchasedCourses.map(
         (purchase) => purchase.courseId
       );
-    }
+    } // Step 2: Query related courses, excluding the current course and purchased courses if userId exists
 
-    // Step 2: Query related courses, excluding the current course and purchased courses
     const relatedCourses = await db.course.findMany({
       where: {
         isPublished: true,
         categoryId,
         id: {
           not: currentCourseId, // Exclude the current course
-          notIn: purchasedCourseIds, // Exclude purchased courses if userId exists
+          notIn: userId ? purchasedCourseIds : [], // Exclude purchased courses only if userId exists
         },
       },
       include: {
         category: true,
-        prices:true,
+        prices: true,
       },
       orderBy: {
         createdAt: "desc",
       },
       take: limit,
     });
-// console.log(relatedCourses);
+
     return relatedCourses;
   } catch (error) {
     console.error("[GET_RELATED_COURSES]", error);

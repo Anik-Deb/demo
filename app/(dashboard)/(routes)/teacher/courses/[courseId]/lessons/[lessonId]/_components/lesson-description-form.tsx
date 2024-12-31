@@ -71,13 +71,15 @@ export const LessonDescriptionForm = ({
           `/api/courses/${courseId}/lessons/${lessonId}/update`,
           data
         );
+        router.refresh();
         toast.success("TextContent updated successfully");
         setLoading(false);
-        router.refresh();
+        setIsEditing(false);
       } catch (error) {
         console.error("Error updating TextContent:", error);
         toast.error("Something went wrong");
         setLoading(false);
+        
       }
     }
   };
@@ -85,7 +87,7 @@ export const LessonDescriptionForm = ({
   return (
     <div className="mt-6 border bg-slate-100 rounded-md p-4">
       <div className="font-medium flex items-center justify-between">
-        Lesson description
+        Lesson Content
         <Button onClick={toggleEdit} variant="ghost">
           {isEditing ? (
             <>Cancel</>
@@ -110,7 +112,6 @@ export const LessonDescriptionForm = ({
           )}
         </div>
       )}
-    
 
       {isEditing && (
         <div>

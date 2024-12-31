@@ -3,7 +3,7 @@
 import { Check } from "lucide-react";
 
 export default function WhatYouLearn({ course }) {
-  console.log("learn page");
+  // console.log("learn page");
   return (
     <>
       {course.learningOutcomes.length !== 0 && (

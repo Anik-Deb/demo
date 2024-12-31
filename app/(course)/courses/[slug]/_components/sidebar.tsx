@@ -10,7 +10,7 @@ export default function Sidebar({
   onVideoUrlUpdate,
   userId,
 }) {
-  console.log("access", access);
+  // console.log("access", access);
 
   return (
     <div>

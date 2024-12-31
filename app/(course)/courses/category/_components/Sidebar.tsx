@@ -15,11 +15,11 @@ export default function Sidebar({
       <div>
         {/* category */}
         <h2 className="font-bold text-lg mb-2 sm:mb-4">ক্যাটাগরি</h2>
-        <ul className="flex gap-1 sm:gap-0 sm:flex-col">
+        <ul className="flex md:items-start items-center gap-1 sm:gap-0 sm:flex-col md:gap-x-0 gap-x-2  md:overflow-x-visible overflow-x-auto md:pb-0 pb-2 md:min-w-fit">
           {[{ id: "all", name: "All" }, ...safeItems].map((item) => (
             <li
               key={item.id} // Use item.id instead of index for better key management
-              className="border rounded-md sm:border-0 text-sm px-2 sm:text-base sm:px-0 sm:mb-2"
+              className="text-sm px-2 sm:text-base sm:px-0 sm:mb-2"
             >
               <CategoryItem label={item.name} value={item.id} />
             </li>

@@ -32,11 +32,12 @@ export default function VisitorSidebar({ course, access, userId }: any) {
               {/* Course Image */}
               <Image
                 alt={course?.imageUrl}
-                className="object-cover h-[250px]"
+                className="object-cover h-[250px] w-full"
                 height={100}
                 width={400}
-                src={course?.imageUrl}
                 priority
+                src={course?.imageUrl}
+                loading="eager"
               />
             </div>
           ) : (
@@ -44,11 +45,12 @@ export default function VisitorSidebar({ course, access, userId }: any) {
               {/* Course Image Only */}
               <Image
                 alt={course?.imageUrl}
-                className="object-cover h-[250px]"
+                className="object-cover h-[250px] w-full"
                 height={100}
                 width={400}
                 src={course?.imageUrl}
                 priority
+                loading="eager"
               />
             </div>
           )}

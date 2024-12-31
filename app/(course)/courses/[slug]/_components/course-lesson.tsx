@@ -53,9 +53,9 @@ export default function CourseLesson({ course }) {
                       >
                         <div className="w-full flex gap-2">
                           {lesson.videoUrl !== null ? (
-                            <PlayCircle className="w-5 h-5 text-red-500" />
+                            <PlayCircle className="w-5 h-5 text-gray-500" />
                           ) : (
-                            <FileText className="h-5 w-5 text-green-500" />
+                            <FileText className="h-5 w-5 text-gray-500" />
                           )}
                           <div>
                             <p className="text-sm text-black capitalize text-start">
@@ -89,9 +89,9 @@ export default function CourseLesson({ course }) {
                   <div className="flex justify-between w-full gap-4">
                     <div className="w-full flex gap-2">
                       {lesson.videoUrl !== null ? (
-                        <PlayCircle className="w-5 h-5 text-red-500" />
+                        <PlayCircle className="w-5 h-5 text-gray-500" />
                       ) : (
-                        <FileText className="h-5 w-5 text-green-500" />
+                        <FileText className="h-5 w-5 text-gray-500" />
                       )}
                       <div>
                         <p className="text-sm text-black capitalize">

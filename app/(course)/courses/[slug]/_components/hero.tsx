@@ -9,7 +9,7 @@ export default function Hero({ course, ratingData }) {
     .padStart(2, "0")}/${date.getFullYear()}`;
 
   const { averageRating, ratingsCount, enrolledStudents } = ratingData || {};
-  console.log("hero page");
+  // console.log("hero page");
   return (
     <div className="bg-[#115E57]">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-x-6 p-6 lg:px-8">
@@ -72,9 +72,9 @@ export default function Hero({ course, ratingData }) {
             <span className="ml-2 text-yellow-300 underline">
               ({ratingsCount || 0} ratings)
             </span>
-            <span className="ml-2 text-white">
+            {/* <span className="ml-2 text-white">
               {enrolledStudents || 0} students
-            </span>
+            </span> */}
           </div>
 
           {/* created by */}

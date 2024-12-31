@@ -14,6 +14,27 @@ import AuthorBio from "./author-bio";
 import Review from "./review";
 import MoreCourses from "./more-course";
 import RelatedCourse from "./related-course";
+import { useSearchParams } from "next/navigation";
+
+const TabNavigation = ({ tabs, activeTab, onTabChange }) => {
+  return (
+    <div className="flex border-b border-gray-300">
+      {tabs.map((tab) => (
+        <button
+          key={tab.value}
+          className={`flex-1 py-3 transition duration-200 ${
+            activeTab === tab.value
+              ? "border-b-2 border-teal-700 text-teal-700"
+              : "text-gray-600 hover:text-teal-600 focus:outline-none"
+          }`}
+          onClick={() => onTabChange(tab.value)}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+};
 
 export const LessonContent = ({
   lesson,
@@ -28,6 +49,33 @@ export const LessonContent = ({
   const isLocked = !lesson.isFree && !purchase;
   const completeOnEnd = !!purchase && !userProgress?.isCompleted;
   const [activeTab, setActiveTab] = useState("content");
+
+  const searchParams = useSearchParams();
+  const success = searchParams.get("success");
+  const canceled = searchParams.get("canceled");
+  const failed = searchParams.get("failed");
+
+  const tabs = [
+    { label: "Lesson Content", value: "content" },
+    { label: "Course Description", value: "description" },
+    { label: "Rating", value: "rating" },
+  ];
+
+  // State to manage the notification message
+  const [notificationMessage, setNotificationMessage] = useState(null);
+
+  useEffect(() => {
+    // Determine message based on URL parameters
+    if (success) {
+      setNotificationMessage("Course purchase completed successfully");
+    } else if (canceled) {
+      setNotificationMessage("Course purchase canceled");
+    } else if (failed) {
+      setNotificationMessage("Course purchase failed");
+    } else {
+      setNotificationMessage(null); // No message if parameters do not match
+    }
+  }, [success, canceled, failed]);
 
   // Function to extract video ID from different YouTube URL formats
   const getYouTubeVideoId = (url: string) => {
@@ -53,7 +101,9 @@ export const LessonContent = ({
   return (
     <div>
       {/* Course title */}
-      <NotificationHandler />
+      {notificationMessage && (
+        <NotificationHandler message={notificationMessage} />
+      )}
       <div className="bg-[#105650]">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-x-6 px-6 py-3 lg:px-8">
           <h1 className="text-xl font-semibold text-white">{course.title}</h1>
@@ -63,60 +113,61 @@ export const LessonContent = ({
         <div className="w-full flex flex-col lg:flex-row gap-4 lg:gap-8">
           <div className="flex-1">
             {/* dynamic Video */}
-            <div>
-              {currentVideoUrl ? (
-                // Check the type of video URL and render the appropriate player
-                isYouTubeVideo && youtubeVideoId ? (
-                  <div className="aspect-w-16 aspect-h-9 relative">
-                    <iframe
-                      src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&mute=1`}
-                      title="YouTube Video"
-                      frameBorder="0"
-                      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="absolute top-0 left-0 w-full h-full"
+            {currentVideoUrl && (
+              <div className="mb-4">
+                {
+                  // Check the type of video URL and render the appropriate player
+                  isYouTubeVideo && youtubeVideoId ? (
+                    <div className="aspect-w-16 aspect-h-9 relative">
+                      <iframe
+                        src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&mute=1`}
+                        title="YouTube Video"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="absolute top-0 left-0 w-full h-full"
+                      />
+                    </div>
+                  ) : isEmbeddedVideo ? (
+                    <div className="aspect-w-16 aspect-h-9 relative">
+                      <iframe
+                        className="w-full h-full"
+                        src={currentVideoUrl}
+                        frameBorder="0"
+                        allowFullScreen
+                        title="Embedded Video"
+                      ></iframe>
+                    </div>
+                  ) : isDirectVideo ? (
+                    <div className="aspect-w-16 aspect-h-9 relative">
+                      <video className="w-full h-full" controls autoPlay muted>
+                        <source src={currentVideoUrl} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    </div>
+                  ) : (
+                    <VdocipherVideoPlayer
+                      chapterId={lesson.id}
+                      title={lesson.title}
+                      courseId={course.id || ""}
+                      nextChapterId={null}
+                      videoUrl={currentVideoUrl}
+                      videoStatus={lesson.videoStatus || ""}
+                      isLocked={isLocked}
+                      completeOnEnd={completeOnEnd}
                     />
-                  </div>
-                ) : isEmbeddedVideo ? (
-                  <div className="aspect-w-16 aspect-h-9 relative">
-                    <iframe
-                      className="w-full h-full"
-                      src={currentVideoUrl}
-                      frameBorder="0"
-                      allowFullScreen
-                      title="Embedded Video"
-                    ></iframe>
-                  </div>
-                ) : isDirectVideo ? (
-                  <div className="aspect-w-16 aspect-h-9 relative">
-                    <video className="w-full h-full" controls autoPlay muted>
-                      <source src={currentVideoUrl} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
-                  </div>
-                ) : (
-                  <VdocipherVideoPlayer
-                    chapterId={lesson.id}
-                    title={lesson.title}
-                    courseId={course.id || ""}
-                    nextChapterId={null}
-                    videoUrl={currentVideoUrl}
-                    videoStatus={lesson.videoStatus || ""}
-                    isLocked={isLocked}
-                    completeOnEnd={completeOnEnd}
-                  />
-                )
-              ) : (
-                <p className="text-white">Video URL is missing or invalid.</p>
-              )}
-            </div>
+                  )
+                }
+              </div>
+            )}
+
             {/* dynamic course Content */}
-            <div className="min-h-screen mt-4">
-              <div className="flex items-center justify-between">
-                <h1 className="text-xl font-semibold text-black capitalize">
+            <div className="min-h-auto md:min-h-auto ">
+              <div className="flex flex-row flex-wrap gap-x-4 items-center justify-between">
+                <h1 className="text-xl font-semibold text-black capitalize truncat">
                   {lesson.title}
                 </h1>
-                <div className="flex justify-end mt-2">
+                <div className="flex  justify-start mt-2 mb-4">
                   <CourseProgressButton
                     course={course}
                     lessonId={lesson.id}
@@ -127,60 +178,44 @@ export const LessonContent = ({
                   />
                 </div>
               </div>
-              <Tabs
-                defaultValue="content"
-                value={activeTab}
-                onValueChange={setActiveTab}
-                className="mt-4"
-              >
-                {/* Tabs Navigation */}
-                <TabsList className="flex border-b justify-start">
-                  <TabsTrigger
-                    value="content"
-                    className="px-4 py-2 font-medium text-gray-600"
-                  >
-                    Text Content
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="description"
-                    className="px-4 py-2 font-medium text-gray-600 "
-                  >
-                    Course Description
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="rating"
-                    className="px-4 py-2 font-medium text-gray-600 "
-                  >
-                    Rating
-                  </TabsTrigger>
-                </TabsList>
-
-                {/* Tabs Content */}
-                <TabsContent value="content" className="pt-4">
-                  {lesson?.textContent ? (
-                    <div className="mx-auto flex max-w-7xl items-center justify-between gap-x-6">
-                      <div className="w-full max-w-[51rem]">
-                        <div className="w-full">
-                          <Preview value={lesson?.textContent} />
+              <div>
+                <div>
+                  <TabNavigation
+                    tabs={tabs}
+                    activeTab={activeTab}
+                    onTabChange={setActiveTab}
+                  />
+                  <div className="pt-4">
+                    {activeTab === "content" && (
+                      <div className="mx-auto flex max-w-7xl min-h-[150px] items-center justify-between gap-x-6">
+                        <div className="w-full max-w-[51rem]">
+                          <div className="w-full">
+                            {lesson?.textContent ? (
+                              <Preview value={lesson.textContent} />
+                            ) : (
+                              <div className="min-h-[150px] text-red-400 border border-red-200 rounded-md flex justify-center items-center">
+                                <p>কোন কনটেন্ট পাওয়া যায়নি!</p>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ) : (
-                    <p className="text-gray-500">
-                      No content available for this lesson.
-                    </p>
-                  )}
-                </TabsContent>
+                    )}
 
-                <TabsContent value="description" className="pt-4">
-                  <CourseDescription course={course} />
-                </TabsContent>
+                    {activeTab === "description" && (
+                      <CourseDescription course={course} />
+                    )}
 
-                <TabsContent value="rating" className="pt-4">
-                  <RatingForm courseId={course?.id} userId={userId} />
-                </TabsContent>
-              </Tabs>
-              <RelatedCourse courses={relatedCourses} />
+                    {activeTab === "rating" && (
+                      <RatingForm courseId={course?.id} userId={userId} />
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="hidden md:block">
+                <RelatedCourse courses={relatedCourses} />
+              </div>
               {/* 
               <AuthorBio />
               <Review />
@@ -204,6 +239,9 @@ export const LessonContent = ({
                 </div>
               </div>
             </div>
+          </div>
+          <div className="block md:hidden">
+            <RelatedCourse courses={relatedCourses} />
           </div>
         </div>
       </div>

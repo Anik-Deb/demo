@@ -297,11 +297,11 @@ model Purchase {
 
   aamarPayData   AamarPayData?
   TeacherRevenue TeacherRevenue[]
+  // @@unique([userId, membershipPlanId])
+  // @@index([userId]) // Index to optimize queries
 
   // Unique constraint to ensure a user can purchase the same course or membership only once
   @@unique([userId, courseId])
-  @@unique([userId, membershipPlanId])
-  @@index([userId]) // Index to optimize queries
 }
 
 model AamarPayData {
@@ -328,6 +328,8 @@ model AamarPayData {
 model TeacherRevenue {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   userId       String   @db.ObjectId
+  teacherId    String   @db.ObjectId
+  courseId     String?  @db.ObjectId
   user         User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   purchaseId   String   @db.ObjectId
   purchase     Purchase @relation(fields: [purchaseId], references: [id])

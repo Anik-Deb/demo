@@ -17,7 +17,7 @@ export async function POST(
   req: Request,
   { params }: { params: { courseId: string } }
 ) {
-  const { priceId } = await req.json();
+  const { priceId, teacherId } = await req.json();
 
   try {
     // Get the user session
@@ -89,7 +89,7 @@ export async function POST(
       store_id: process.env.AAMARPAY_STORE_ID,
       currency: "BDT", // Or USD, depending on your need
       desc: `Course: ${course.title}`,
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/callback?courseId=${course.id}&success=1`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/callback?courseId=${course.id}&teacherId=${teacherId}&success=1`,
       fail_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/callback?courseId=${course.id}&failed=1`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/courses/${course.slug}?canceled=1`,
       type: "json", // Required for JSON requests
@@ -98,7 +98,6 @@ export async function POST(
     };
 
     console.log("formData", formData);
-    
 
     const paymentUrl = process.env.AAMARPAY_URL;
 

@@ -1,3 +1,4 @@
+// @ts-nocheck 
 import { Category, Course } from "@prisma/client";
 
 import SingleCourse from "./SingleCourse";
@@ -16,9 +17,9 @@ interface CoursesListProps {
 export const CoursesList = ({ items, userId }: CoursesListProps) => {
   return (
     <div>
-      <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3 gap-4">
+      <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4 gap-4 ">
         {items.map((item) => (
-          <SingleCourse userId={userId} course={item} key={item.id} />
+          <SingleCourse userId={userId} course={item} key={item.id} fetchProgress={false}/>
         ))}
       </div>
 

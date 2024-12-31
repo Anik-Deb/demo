@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, FormEvent } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"; // Ensure Button component is correctly imported
 import { Loader } from "lucide-react";
+import { toast } from "react-hot-toast"; // Import toast correctly
 
 interface RatingFormProps {
   courseId: string;
@@ -13,7 +14,7 @@ const RatingForm: React.FC<RatingFormProps> = ({ courseId, userId }) => {
   const [ratingValue, setRatingValue] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [hasSubmitted, setHasSubmitted] = useState<boolean>(false); // To track submission status
 
   // Fetch existing rating when the component mounts
   useEffect(() => {
@@ -22,13 +23,16 @@ const RatingForm: React.FC<RatingFormProps> = ({ courseId, userId }) => {
         const response = await fetch(
           `/api/courses/ratings?courseId=${courseId}&userId=${userId}`
         );
+
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.message || "Error fetching rating");
         }
+
         const ratingData = await response.json();
         if (ratingData) {
           setRatingValue(ratingData.value); // Pre-set the rating value
+          setHasSubmitted(true); // Mark that the user has submitted a rating
         }
       } catch (err: any) {
         setError(err.message || "Failed to fetch existing rating");
@@ -44,6 +48,7 @@ const RatingForm: React.FC<RatingFormProps> = ({ courseId, userId }) => {
     setLoading(true);
     setError(null); // Reset error state
 
+    // Validate rating value
     if (ratingValue < 1 || ratingValue > 5) {
       setError("Rating must be between 1 and 5!");
       setLoading(false);
@@ -67,7 +72,10 @@ const RatingForm: React.FC<RatingFormProps> = ({ courseId, userId }) => {
         const errorData = await response.json();
         throw new Error(errorData.message || "Error submitting rating");
       }
-      setSuccessMessage("Rating submitted successfully!");
+
+      // Show success toast notification
+      toast.success("Rating submitted successfully!");
+      setHasSubmitted(true); // Mark as submitted
     } catch (err: any) {
       setError(err.message || "Something went wrong!");
     } finally {
@@ -99,19 +107,23 @@ const RatingForm: React.FC<RatingFormProps> = ({ courseId, userId }) => {
             </span>
           ))}
         </div>
+
         <div>
           <div className="flex items-center gap-x-2">
-            <Button className="bg-teal-700" disabled={loading || ratingValue === 0} type="submit">
+            <Button
+              className="bg-teal-700"
+              disabled={loading || ratingValue === 0}
+              type="submit"
+            >
               {loading ? (
                 <Loader className="animate-spin h-4 w-4" />
+              ) : hasSubmitted ? (
+                "Submit again"
               ) : (
                 "Submit Rating"
               )}
             </Button>
             {error && <p style={{ color: "red" }}>{error}</p>}
-            {successMessage && (
-              <p style={{ color: "green" }}>{successMessage}</p>
-            )}
           </div>
         </div>
       </div>

@@ -12,6 +12,7 @@ export async function POST(req: NextRequest) {
     // Parse the URL to extract query parameters
     const url = new URL(req.url);
     const courseId = url.searchParams.get("courseId");
+    const teacherId = url.searchParams.get("teacherId");
     const success = url.searchParams.get("success");
     const failed = url.searchParams.get("failed");
 
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
       opt_b,
     } = data;
 
-    //received userId, priceId as opt_a, opt_b form payment api
+    //received userId, priceId as opt_a, opt_b form payment apis
     const userId = opt_a;
     const priceId = opt_b;
 
@@ -133,6 +134,8 @@ export async function POST(req: NextRequest) {
           TeacherRevenue: {
             create: {
               userId: user.id,
+              teacherId: teacherId,
+              courseId: courseId,
               amountEarned: teacherRevenue,
             },
           },

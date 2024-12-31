@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 export default function Requirements({ course }) {
-  console.log("reqere page");
+  // console.log("reqere page");
   return (
     <>
       {course.requirements.length === 0 ? (

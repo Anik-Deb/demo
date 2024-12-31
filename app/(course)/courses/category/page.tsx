@@ -41,11 +41,13 @@ export default async function CategoryPage({
         <div className="p-4">
           <div className="flex flex-col gap-8 md:gap-12 md:flex-row">
             {/* Sidebar */}
-            <Sidebar
-              courses={courses}
-              items={categories}
-              searchParams={searchParams}
-            />
+            <div>
+              <Sidebar
+                courses={courses}
+                items={categories}
+                searchParams={searchParams}
+              />
+            </div>
             <div className="w-full md:w-5/6">
               <div className="flex md:flex-row flex-col gap-3 justify-between mb-4">
                 <h1 className="text-2xl font-bold">আমাদের কোর্সসমূহ</h1>

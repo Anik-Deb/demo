@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { Categories } from "./_components/categories";
+import { getDashboardCourses } from "@/actions/get-dashboard-courses";
 
 interface SearchPageProps {
   searchParams: {
@@ -28,7 +29,7 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
     orderBy: {
       name: "asc",
     },
-  });
+  }); 
   if (!categories) {
     redirect("/dashboard");
   }
@@ -37,6 +38,10 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
     userId,
     ...searchParams,
   });
+
+  const { completedCourses, coursesInProgress } = await getDashboardCourses(
+    userId
+  );
 
   return (
     <>
@@ -48,6 +53,9 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
         <CategoryPagination
           items={courses}
           searchParams={searchParams}
+          completedCourses={completedCourses}
+          coursesInProgress={coursesInProgress}
+          userId={userId}
           url="/search"
         />
       </div>

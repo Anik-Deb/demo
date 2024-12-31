@@ -1,95 +1,116 @@
 // @ts-nocheck
-import { Button } from "@/components/ui/button";
-import { convertNumberToBangla } from "@/lib/convertNumberToBangla";
 import Image from "next/image";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { convertNumberToBangla } from "@/lib/convertNumberToBangla";
 import { CourseProgress } from "./course-progress";
 import { Preview } from "./preview";
+import { Play } from "lucide-react";
 
-export default async function SingleCourse({ course, userId }) {
+
+// Define the component as an async function
+export default async function SingleCourse({
+  course,
+  userId,
+  fetchProgress = true,
+}) {
+  let userProgress = [];
+
+  if (userId && fetchProgress) {
+    // Only call the API if userId is present
+    const apiUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/user/userprogress?userId=${userId}&courseId=${course.id}`;
+
+    const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+      console.error("Error fetching user progress:", response);
+      throw new Error("Error fetching user progress");
+    }
+
+    userProgress = await response.json();
+  }
+
   const {
     id,
     slug,
     imageUrl,
     title,
-    price,
+    prices,
     description,
     category,
     progress,
     purchases,
     lessons,
-  } = course;
+  } = course; // Assume `course` is fetched from a database or API based on courseId
 
-  const offer = 35; // This will come from db.
+  // console.log("price", prices);
+
+  const offer = 35; // This will come from the database
 
   // Check if the course is purchased and user is authenticated
   const isPurchased = purchases && purchases.length > 0;
+
   const isAuthenticated = !!userId;
 
-  const decodedSlug = lessons[0]?.slug
-    ? decodeURIComponent(lessons[0].slug)
-    : "";
-  console.log("single page");
+  // Check for the completed lessons and find the next lesson
+  const completedLessonIds = userProgress.map((progress) => progress.lessonId);
+  const nextLesson = lessons.find(
+    (lesson) => lesson.isPublished && !completedLessonIds.includes(lesson.id)
+  );
+  const nextLessonSlug = nextLesson ? nextLesson.slug : null;
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
-      <div className="relative border">
-        <Image
-          alt={title}
-          className="object-cover"
-          height={400}
-          width={600}
-          src={imageUrl}
-          priority
-        />
-
-        {/* Video play icon */}
-        <Link
-          href={
-            isAuthenticated && userId && progress !== null
-              ? `/courses/${slug}/${decodedSlug}`
-              : `/courses/${slug}`
-          }
-          className="absolute inset-0 flex items-center justify-center mt-4"
-        >
+      <div className="relative border group">
+        <div className="w-full md:w-full h-0 pb-[56.25%] md:pb-0 md:h-[160px] overflow-hidden ">
           <Image
-            alt=""
-            src="/images/courses/video-icon.svg"
-            height={100}
-            width={100}
+            alt={title}
+            className="object-cover"
+            fill
+            src={imageUrl}
             priority
           />
+        </div>
+        <Link
+          href={
+            isAuthenticated && progress !== null
+              ? `/courses/${slug}/${lessons[0]?.slug}`
+              : `/courses/${slug}`
+          }
+          className="absolute inset-0 flex items-center justify-center w-full h-full group"
+        >
+          <div className="flex items-center justify-center transition-all duration-300 hover:bg-[#0000003b] w-full h-full">
+            <div className="bg-[#727374ab] p-3 rounded-full">
+              <Play className="text-white rounded-full" size={16} />
+            </div>
+          </div>
         </Link>
       </div>
 
-      <div className="mt-4 p-4">
-        <div className="flex items-center gap-x-4 text-xs">
+      <div className="p-4 mt-2">
+        <div className="flex items-center gap-x-3 text-xs">
           <Link
-            href={`/courses/category?categoryId=${course?.categoryId}`}
-            className="relative bg-blue-100 text-blue-800 text-xs font-medium rounded-[44px] flex items-center gap-1 px-2 py-2"
+            href={`/courses/category?categoryId=${course?.category?.id}`}
+            className="relative bg-blue-100 text-blue-800 text-xs  font-medium rounded-[44px] flex items-center gap-1 px-3 py-1"
           >
             {category.name}
           </Link>
-          <span className="bg-yellow-100 text-yellow-800 text-xs font-medium rounded-[44px] flex items-center gap-1 px-2 py-2">
+          <span className="bg-yellow-100 text-yellow-800 text-xs font-medium rounded-[44px] flex items-center gap-1 px-3 py-1">
             {convertNumberToBangla(lessons.length) || 0} টি ক্লাস
           </span>
         </div>
-
-        {/* Course Title */}
-        <div className="mb-2 mt-4">
+        <div className="pt-4 pb-2">
           <Link
             href={
-              isAuthenticated && userId && progress !== null
-                ? `/courses/${slug}/${decodedSlug}`
+              isAuthenticated && progress !== null
+                ? `/courses/${slug}/${lessons[0]?.slug}`
                 : `/courses/${slug}`
             }
-            className="text-xl font-bold"
+            className="text-lg font-semibold capitalize hover:text-teal-600 transition-colors duration-300"
           >
             {title}
           </Link>
         </div>
-
-        {/* Card Description */}
-        <div className="text-sm text-gray-700 mb-4 mt-2">
+        <div className="text-sm text-gray-600">
           <Preview
             value={
               description.length > 200 ? description.slice(0, 200) : description
@@ -97,9 +118,58 @@ export default async function SingleCourse({ course, userId }) {
           />
         </div>
       </div>
-
+      {/* price */}
       <div className="p-4 mt-auto">
-        {isAuthenticated && userId && progress !== null ? (
+        {!progress && (
+          <div className="text-left md:p-0 pt-0">
+            {prices?.length > 0 ? (
+              <>
+                {prices[0]?.isFree ? (
+                  <div className="text-md font-semibold text-gray-800">
+                    <span>Free</span>
+                  </div>
+                ) : (
+                  <div>
+                    {prices[0].discountedAmount ? (
+                      <div className="flex flex-row items-center justify-between text-left">
+                        <div className="font-bold text-gray-800">
+                          <span className="text-lg">
+                            ৳{prices[0].discountedAmount}
+                          </span>
+                          <span
+                            className={`text-sm text-gray-500 ${
+                              prices[0].discountedAmount
+                                ? "line-through ml-2"
+                                : ""
+                            }`}
+                          >
+                            {/* previous regular price */}৳
+                            {prices[0].regularAmount}
+                          </span>
+                        </div>
+
+                        <div className="text-xs text-[#F02D00] capitalize font-semibold">
+                          Offer Expires on:{" "}
+                          {new Date(
+                            prices[0].discountExpiresOn
+                          ).toLocaleDateString()}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="font-bold text-gray-800">
+                        <span className="text-lg">
+                          ৳{prices[0].regularAmount}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            ) : null}
+          </div>
+        )}
+
+        {isAuthenticated && progress !== null ? (
           <>
             <div className="mb-4">
               <CourseProgress
@@ -108,16 +178,27 @@ export default async function SingleCourse({ course, userId }) {
                 value={progress}
               />
             </div>
-            <Link href={`/courses/${slug}/${decodedSlug}`} className="mt-4">
-              <Button className="w-full h-12 text-lg bg-teal-500 text-white font-bold py-2 rounded flex items-center justify-center hover:bg-teal-500 hover:opacity-80">
-                চালিয়ে যান
-              </Button>
-            </Link>
+            {nextLessonSlug ? (
+              <Link href={`/courses/${slug}/${nextLessonSlug}`}>
+                <Button className="w-full h-12 text-lg bg-teal-500 text-white font-bold py-2 rounded flex items-center justify-center hover:bg-teal-600">
+                  চালিয়ে যান
+                </Button>
+              </Link>
+            ) : (
+              <Link
+                href={`/courses/${slug}/${lessons[0]?.slug}`}
+                className="mt-4"
+              >
+                <Button className="w-full h-12 text-lg bg-teal-500 text-white font-bold py-2 rounded flex items-center justify-center hover:bg-teal-500 hover:opacity-80">
+                  চালিয়ে যান
+                </Button>
+              </Link>
+            )}
           </>
         ) : (
           <div>
-            <div className="flex items-center text-gray-500 mt-2 mb-4"></div>
-            <Link href={`/courses/${slug}`} replace>
+            <div className="flex items-center text-gray-500 mb-4"></div>
+            <Link href={`/courses/${slug}`}>
               <Button
                 type="button"
                 className="w-full h-12 bg-teal-500 text-white font-bold py-2 rounded flex items-center justify-center hover:bg-teal-500 hover:opacity-80"

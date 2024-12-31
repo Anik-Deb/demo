@@ -13,7 +13,7 @@ const SingleCoursePrice = async ({ course, userId }) => {
     const discountExpiryDate = new Date(expiresAt);
     return currentDate.getTime() > discountExpiryDate.getTime();
   };
-console.log("single course price");
+// console.log("single course price");
   return (
     <>
       <div>
@@ -71,6 +71,7 @@ console.log("single course price");
         </RadioGroup>
 
         <CheckoutButton
+          course={course}
           userId={userId}
           courseId={course.id}
           priceId={course.prices[0].id} // Use default price

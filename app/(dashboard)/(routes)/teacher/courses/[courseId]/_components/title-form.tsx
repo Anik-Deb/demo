@@ -26,6 +26,14 @@ interface TitleFormProps {
   courseId: string;
 }
 
+// Helper function to convert a string to title case
+const toTitleCase = (str: string) => {
+  return str.toLowerCase().replace(/\b(\w)/g, (match) => match.toUpperCase());
+};
+
+// Function to check if the title is in English (only contains English letters, numbers, and spaces)
+const isEnglish = (str: string) => /^[a-zA-Z0-9\s]+$/.test(str);
+
 const formSchema = z.object({
   title: z.string().min(1, {
     message: "Title is required",
@@ -48,6 +56,12 @@ export const TitleForm = ({ initialData, courseId }: TitleFormProps) => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setLoading(true); // Set loading to true
+
+    // Check if the title is in English and if so, convert to title case
+    if (isEnglish(values.title)) {
+      values.title = toTitleCase(values.title);
+    }
+
     try {
       await axios.patch(`/api/courses/${courseId}`, values);
       toast.success("Course updated");
