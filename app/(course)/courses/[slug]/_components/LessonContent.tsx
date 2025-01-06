@@ -18,7 +18,7 @@ import { useSearchParams } from "next/navigation";
 import { useGetAllLessonsMutation } from "@/lib/redux/Actions/lessons";
 import StudentSidebar from "./student-sidebar";
 import { useLessonContext } from "@/lib/utils/LessonContext";
-import { Loader } from "lucide-react";
+import { Loader, Loader2Icon } from "lucide-react";
 
 const TabNavigation = ({ tabs, activeTab, onTabChange }) => {
   return (
@@ -49,12 +49,29 @@ export const LessonContent = () => {
     purchase,
     userId,
     loading,
+    setLoading,
   } = useLessonContext();
 
   const [currentVideoUrl, setCurrentVideoUrl] = useState(lesson.videoUrl);
   const isLocked = !lesson.isFree && !purchase;
   const completeOnEnd = !!purchase && !userProgress?.isCompleted;
   const [activeTab, setActiveTab] = useState("content");
+
+  const handleLessonChange = () => {
+    setLoading(true); // Set loading state when lesson is being changed
+  };
+
+  useEffect(() => {
+    if (lesson.videoUrl !== currentVideoUrl) {
+      setLoading(true); // Start loading when video URL changes
+      setCurrentVideoUrl(lesson.videoUrl); // Update video URL
+    }
+
+    // Stop loading once video URL is updated
+    if (lesson.videoUrl === currentVideoUrl) {
+      setLoading(false);
+    }
+  }, [lesson, currentVideoUrl]);
 
   const searchParams = useSearchParams();
   const success = searchParams.get("success");
@@ -109,17 +126,19 @@ export const LessonContent = () => {
       {notificationMessage && (
         <NotificationHandler message={notificationMessage} />
       )}
-      {loading && (
-        <div className="flex-1">
-          <div className="h-[400px] w-full bg-gray-200 rounded-md animate-pulse"></div>
-        </div>
-      )}
-      {!loading && (
-        <div>
-          {/* dynamic Video */}
-          <div>
+
+      <div>
+        {/* dynamic Video */}
+        {loading ? (
+          <div className="flex-1">
+            <div className="h-[450px] w-full bg-gray-200 rounded-md flex justify-center items-center animate-pulse backdrop-blur-sm mb-4">
+              <Loader className="h-5 w-5 animate-spin" />
+            </div>
+          </div>
+        ) : (
+          <div className="transition-opacity duration-700 ease-in-out opacity-100">
             {currentVideoUrl && (
-              <div className="mb-4">
+              <div className="mb-4 mb-4 transition-opacity duration-700 ease-in-out opacity-100">
                 {
                   // Check the type of video URL and render the appropriate player
                   isYouTubeVideo && youtubeVideoId ? (
@@ -168,60 +187,61 @@ export const LessonContent = () => {
               </div>
             )}
           </div>
-          {/* dynamic course Content */}
-          <div className="min-h-auto md:min-h-auto ">
-            <div className="flex flex-row flex-wrap gap-x-4 items-center justify-between">
-              <h1 className="text-xl font-semibold text-black capitalize truncat">
-                {lesson.title}
-              </h1>
-              <div className="flex  justify-start mt-2 mb-4">
-                <CourseProgressButton
-                  course={course}
-                  lessonId={lesson.id}
-                  courseId={course.id}
-                  nextLessonId={nextLesson?.id}
-                  isCompleted={userProgress?.isCompleted}
-                  userId={userId}
-                />
-              </div>
+        )}
+        {/* dynamic course Content */}
+        <div className="min-h-auto md:min-h-auto ">
+          <div className="flex flex-row flex-wrap gap-x-4 items-center justify-between">
+            <h1 className="text-xl font-semibold text-black capitalize truncat">
+              {lesson.title}
+            </h1>
+            <div className="flex  justify-start mt-2 mb-4">
+              <CourseProgressButton
+                course={course}
+                lessonId={lesson.id}
+                courseId={course.id}
+                nextLessonId={nextLesson?.id}
+                isCompleted={userProgress?.isCompleted}
+                userId={userId}
+              />
             </div>
+          </div>
+          <div>
+            {/* tab content */}
             <div>
-              <div>
-                <TabNavigation
-                  tabs={tabs}
-                  activeTab={activeTab}
-                  onTabChange={setActiveTab}
-                />
-                <div className="pt-4">
-                  {activeTab === "content" && (
-                    <div className="mx-auto flex max-w-7xl min-h-[150px] items-center justify-between gap-x-6">
-                      <div className="w-full max-w-[51rem]">
-                        <div className="w-full">
-                          {lesson?.textContent ? (
-                            <Preview value={lesson.textContent} />
-                          ) : (
-                            <div className="min-h-[150px] text-gray-400 border border-gray-200 rounded-md flex justify-center items-center">
-                              <p>কোন কনটেন্ট পাওয়া যায়নি!</p>
-                            </div>
-                          )}
-                        </div>
+              <TabNavigation
+                tabs={tabs}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+              />
+              <div className="pt-4">
+                {activeTab === "content" && (
+                  <div className="mx-auto flex max-w-7xl min-h-[150px] items-center justify-between gap-x-6">
+                    <div className="w-full max-w-[51rem]">
+                      <div className="w-full">
+                        {lesson?.textContent ? (
+                          <Preview value={lesson.textContent} />
+                        ) : (
+                          <div className="min-h-[150px] text-gray-400 border border-gray-200 rounded-md flex justify-center items-center">
+                            <p>কোন কনটেন্ট পাওয়া যায়নি!</p>
+                          </div>
+                        )}
                       </div>
                     </div>
-                  )}
+                  </div>
+                )}
 
-                  {activeTab === "description" && (
-                    <CourseDescription course={course} />
-                  )}
+                {activeTab === "description" && (
+                  <CourseDescription course={course} />
+                )}
 
-                  {activeTab === "rating" && (
-                    <RatingForm courseId={course?.id} userId={userId} />
-                  )}
-                </div>
+                {activeTab === "rating" && (
+                  <RatingForm courseId={course?.id} userId={userId} />
+                )}
               </div>
             </div>
           </div>
         </div>
-      )}
+      </div>
     </>
   );
 };

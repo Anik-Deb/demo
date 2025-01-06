@@ -1,12 +1,11 @@
 // @ts-nocheck
 
-
 import { LessonContent } from "../_components/LessonContent";
 
 const page = () => {
   return (
     <div>
-        <LessonContent />
+      <LessonContent />
     </div>
   );
 };

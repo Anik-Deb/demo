@@ -18,10 +18,9 @@ const StudentSidebarLessons = ({
   const { setLoading } = useLessonContext(); // Use setLoading from context
   const router = useRouter();
 
-  const handlePlayClick = async () => {
-    setLoading(true); // Start loading
-    await router.push(`/courses/${courseSlug}/${item?.slug}`);
-    setLoading(false); // End loading
+  const handlePlayClick = () => {
+    setLoading(true); // Show loader when lesson is clicked
+    router.push(`/courses/${courseSlug}/${item?.slug}`);
   };
 
   return (

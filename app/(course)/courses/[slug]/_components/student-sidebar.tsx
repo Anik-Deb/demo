@@ -9,9 +9,9 @@ export default function StudentSidebar({
   lesson,
   videoUrl,
   courseSlug,
-  currentLessonSlug
+  currentLessonSlug,
 }) {
-  const { lessonSlug } = useParams(); // This works because the component is now client-side.
+  const { lessonSlug } = useParams(); 
 
   return (
     <div className="p-3 relative max-h-[90vh] overflow-y-auto ">
@@ -20,7 +20,7 @@ export default function StudentSidebar({
       {/* show lessons */}
       {lesson.map((item, index) => (
         <StudentSidebarLessons
-          key={item?.id}
+          key={index}
           value={item?.id}
           item={item}
           lessonSlug={lessonSlug}
