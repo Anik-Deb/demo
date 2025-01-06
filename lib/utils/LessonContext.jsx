@@ -1,11 +1,12 @@
 "use client";
-import { createContext, useContext } from "react";
+import { createContext, useContext, useState } from "react";
 
 const LessonContext = createContext(null);
 
 export const LessonProvider = ({ children, value }) => {
+  const [loading, setLoading] = useState(false); // Loading state
   return (
-    <LessonContext.Provider value={value}>{children}</LessonContext.Provider>
+    <LessonContext.Provider  value={{ ...value, loading, setLoading }}>{children}</LessonContext.Provider>
   );
 };
 

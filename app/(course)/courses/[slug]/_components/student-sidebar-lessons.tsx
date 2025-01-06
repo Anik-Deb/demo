@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { FileTextIcon, PlayCircleIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useLessonContext } from "@/lib/utils/LessonContext";
 
 const StudentSidebarLessons = ({
   item,
@@ -11,26 +12,25 @@ const StudentSidebarLessons = ({
   courseSlug,
   index,
   videoUrl,
-  isLast, // Receive isLast prop
-  isActive, // Receive isActive prop
+  isLast,
+  isActive,
 }) => {
-  const [activeVideoUrl, setActiveVideoUrl] = useState(videoUrl);
+  const { setLoading } = useLessonContext(); // Use setLoading from context
   const router = useRouter();
 
-  const handlePlayClick = () => {
-    // Update the active video URL
-    setActiveVideoUrl(item?.videoUrl);
-    // Push the new lesson route
-    router.push(`/courses/${courseSlug}/${item?.slug}`);
+  const handlePlayClick = async () => {
+    setLoading(true); // Start loading
+    await router.push(`/courses/${courseSlug}/${item?.slug}`);
+    setLoading(false); // End loading
   };
 
   return (
     <div className="bg-white">
       <div
-        className={`cursor-pointer flex items-start gap-2 py-3 rounded-md transition-all ${
-          !isLast ? "border-b border-gray-100" : "" // Conditionally apply border
+        className={`cursor-pointer flex items-start gap-2 py-3 rounded-md transition-all hover:text-teal-700 ${
+          !isLast ? "border-b border-gray-100" : ""
         } ${isActive ? "text-teal-700 font-semibold" : "text-gray-600"}`}
-        onClick={() => handlePlayClick()}
+        onClick={handlePlayClick}
       >
         {item.videoUrl !== null ? (
           <PlayCircleIcon
@@ -45,9 +45,7 @@ const StudentSidebarLessons = ({
             }`}
           />
         )}
-
         <div className="text-sm flex gap-2">
-          {/* <span className="min-w-max text-nowrap">Lesson {index + 1}:</span> */}
           <p
             className="text-sm capitalize"
             dangerouslySetInnerHTML={{
