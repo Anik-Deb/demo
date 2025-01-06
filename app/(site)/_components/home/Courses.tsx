@@ -6,12 +6,11 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import FeaturedCourses from "./FeaturedCourses";
+import { Suspense } from "react";
+import SkeletonCard from "@/components/SkeletonCard";
 
-export default function Courses({ courses }) {
-  if (!courses || !Array.isArray(courses)) {
-    return null; 
-  }
-
+export default function Courses() {
   return (
     <div className="bg-gray-50" id="course">
       <div className="mx-auto max-w-7xl">
@@ -27,33 +26,9 @@ export default function Courses({ courses }) {
                 প্রি-এনরোলমেন্ট করুন। গ্রহণ করুন বিশেষ ছাড়।
               </p>
             </div>
-
-            {/* Courses List */}
-            {courses.length === 0 ? (
-              <div className="text-center mt-8">
-                <p className="text-red-400 border border-red-200 p-2 rounded-md">
-                  কোন কোর্স পাওয়া যায়নি!
-                </p>
-              </div>
-            ) : (
-              <div className="mx-auto mt-16 grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
-                {courses.slice(0, 8).map((course) => (
-                  <SingleCourse course={course} key={course.id} /> 
-                ))}
-              </div>
-            )}
-
-            {/* Show "Load More" button if more than 8 courses */}
-            {courses.length > 8 && (
-              <div className="text-center mt-12">
-                <Link href={`/courses/category?page=1`}>
-                  <Button className="mx-auto flex gap-2 border-teal-600 hover:bg-white bg-white border hover:opacity-70 font-bold text-teal-600">
-                    আরও দেখুন
-                    <ArrowRight className="w-4 h-4 stroke-teal-600" />
-                  </Button>
-                </Link>
-              </div>
-            )}
+            <Suspense fallback={<SkeletonCard />}>
+              <FeaturedCourses />
+            </Suspense>
           </div>
         </div>
       </div>

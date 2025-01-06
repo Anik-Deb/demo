@@ -3,14 +3,14 @@
 import { db } from "@/lib/db";
 import { getServerUserSession } from "@/lib/getServerUserSession";
 
-export async function getCourseBySlug(courseSlug) {
+export async function getCourseBySlug(courseSlug, userId) {
   try {
     // Validate the presence of courseSlug
     if (!courseSlug) {
       throw new Error("Failed to fetch the course. Missing course slug.");
     }
 
-    const { userId } = await getServerUserSession();
+    // const { userId } = await getServerUserSession();
 
     // Fetch course details with related data
     const course = await db.course.findUnique({

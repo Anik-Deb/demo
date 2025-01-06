@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { CategoryPagination } from "./_components/CategoryPagination";
 import Sidebar from "./_components/Sidebar";
 import { getServerUserSession } from "@/lib/getServerUserSession";
+import { getDashboardCourses } from "@/actions/get-dashboard-courses";
 
 interface SearchParams {
   page?: string;
@@ -31,9 +32,13 @@ export default async function CategoryPage({
   }
 
   const courses = await getCourses({
-    ...searchParams,
     userId,
+    ...searchParams,
   });
+
+  const { completedCourses, coursesInProgress } = await getDashboardCourses(
+    userId
+  );
 
   return (
     <div className="max-w-7xl mx-auto p-6 lg:px-8">
@@ -52,9 +57,18 @@ export default async function CategoryPage({
               <div className="flex md:flex-row flex-col gap-3 justify-between mb-4">
                 <h1 className="text-2xl font-bold">আমাদের কোর্সসমূহ</h1>
               </div>
+              {/* <CategoryPagination
+                items={courses}
+                searchParams={searchParams}
+                url="/courses/category"
+              /> */}
+
               <CategoryPagination
                 items={courses}
                 searchParams={searchParams}
+                completedCourses={completedCourses}
+                coursesInProgress={coursesInProgress}
+                userId={userId}
                 url="/courses/category"
               />
             </div>

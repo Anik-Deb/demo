@@ -5,6 +5,7 @@ import { IconBadge } from "@/components/icon-badge";
 import { db } from "@/lib/db";
 import { getServerUserSession } from "@/lib/getServerUserSession";
 import {
+  ArrowLeft,
   CircleDollarSign,
   File,
   LayoutDashboard,
@@ -24,6 +25,7 @@ import { LessonsForm } from "./_components/lessons-form";
 import { LearningOutcomesForm } from "./_components/learningOutcome-form";
 import { CourseRequirementsForm } from "./_components/coureseRequirements-form";
 import { SlugTitleForm } from "./_components/slug-title-form";
+import Link from "next/link";
 
 const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
   const { userId } = await getServerUserSession();
@@ -89,6 +91,13 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
         <Banner label="This course is unpublished. It will not be visible to the students." />
       )}
       <div className="p-6">
+        <Link
+          href={`/teacher/courses`}
+          className="flex items-center text-sm hover:opacity-75 transition mb-6"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to courses
+        </Link>
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-y-2">
             <h1 className="text-2xl font-medium">Course setup</h1>

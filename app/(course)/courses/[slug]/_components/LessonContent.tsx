@@ -15,6 +15,9 @@ import Review from "./review";
 import MoreCourses from "./more-course";
 import RelatedCourse from "./related-course";
 import { useSearchParams } from "next/navigation";
+import { useGetAllLessonsMutation } from "@/lib/redux/Actions/lessons";
+import StudentSidebar from "./student-sidebar";
+import { useLessonContext } from "@/lib/utils/LessonContext";
 
 const TabNavigation = ({ tabs, activeTab, onTabChange }) => {
   return (
@@ -36,15 +39,10 @@ const TabNavigation = ({ tabs, activeTab, onTabChange }) => {
   );
 };
 
-export const LessonContent = ({
-  lesson,
-  course,
-  nextLesson,
-  userProgress,
-  purchase,
-  userId,
-  relatedCourses,
-}) => {
+export const LessonContent = () => {
+  const { lesson, course, nextLesson, userProgress, purchase, userId } =
+    useLessonContext();
+
   const [currentVideoUrl, setCurrentVideoUrl] = useState(lesson.videoUrl);
   const isLocked = !lesson.isFree && !purchase;
   const completeOnEnd = !!purchase && !userProgress?.isCompleted;
@@ -99,152 +97,116 @@ export const LessonContent = ({
     : null;
 
   return (
-    <div>
-      {/* Course title */}
+    <>
       {notificationMessage && (
         <NotificationHandler message={notificationMessage} />
       )}
-      <div className="bg-[#105650]">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-x-6 px-6 py-3 lg:px-8">
-          <h1 className="text-xl font-semibold text-white">{course.title}</h1>
-        </div>
-      </div>
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-x-6 p-6 lg:px-8">
-        <div className="w-full flex flex-col lg:flex-row gap-4 lg:gap-8">
-          <div className="flex-1">
-            {/* dynamic Video */}
-            {currentVideoUrl && (
-              <div className="mb-4">
-                {
-                  // Check the type of video URL and render the appropriate player
-                  isYouTubeVideo && youtubeVideoId ? (
-                    <div className="aspect-w-16 aspect-h-9 relative">
-                      <iframe
-                        src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&mute=1`}
-                        title="YouTube Video"
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        className="absolute top-0 left-0 w-full h-full"
-                      />
-                    </div>
-                  ) : isEmbeddedVideo ? (
-                    <div className="aspect-w-16 aspect-h-9 relative">
-                      <iframe
-                        className="w-full h-full"
-                        src={currentVideoUrl}
-                        frameBorder="0"
-                        allowFullScreen
-                        title="Embedded Video"
-                      ></iframe>
-                    </div>
-                  ) : isDirectVideo ? (
-                    <div className="aspect-w-16 aspect-h-9 relative">
-                      <video className="w-full h-full" controls autoPlay muted>
-                        <source src={currentVideoUrl} type="video/mp4" />
-                        Your browser does not support the video tag.
-                      </video>
-                    </div>
-                  ) : (
-                    <VdocipherVideoPlayer
-                      chapterId={lesson.id}
-                      title={lesson.title}
-                      courseId={course.id || ""}
-                      nextChapterId={null}
-                      videoUrl={currentVideoUrl}
-                      videoStatus={lesson.videoStatus || ""}
-                      isLocked={isLocked}
-                      completeOnEnd={completeOnEnd}
+      <div>
+        {/* dynamic Video */}
+        <div>
+          {currentVideoUrl && (
+            <div className="mb-4">
+              {
+                // Check the type of video URL and render the appropriate player
+                isYouTubeVideo && youtubeVideoId ? (
+                  <div className="aspect-w-16 aspect-h-9 relative">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&mute=1`}
+                      title="YouTube Video"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="absolute top-0 left-0 w-full h-full"
+                      loading="lazy"
                     />
-                  )
-                }
-              </div>
-            )}
-
-            {/* dynamic course Content */}
-            <div className="min-h-auto md:min-h-auto ">
-              <div className="flex flex-row flex-wrap gap-x-4 items-center justify-between">
-                <h1 className="text-xl font-semibold text-black capitalize truncat">
-                  {lesson.title}
-                </h1>
-                <div className="flex  justify-start mt-2 mb-4">
-                  <CourseProgressButton
-                    course={course}
-                    lessonId={lesson.id}
-                    courseId={course.id}
-                    nextLessonId={nextLesson?.id}
-                    isCompleted={userProgress?.isCompleted}
-                    userId={userId}
-                  />
-                </div>
-              </div>
-              <div>
-                <div>
-                  <TabNavigation
-                    tabs={tabs}
-                    activeTab={activeTab}
-                    onTabChange={setActiveTab}
-                  />
-                  <div className="pt-4">
-                    {activeTab === "content" && (
-                      <div className="mx-auto flex max-w-7xl min-h-[150px] items-center justify-between gap-x-6">
-                        <div className="w-full max-w-[51rem]">
-                          <div className="w-full">
-                            {lesson?.textContent ? (
-                              <Preview value={lesson.textContent} />
-                            ) : (
-                              <div className="min-h-[150px] text-red-400 border border-red-200 rounded-md flex justify-center items-center">
-                                <p>কোন কনটেন্ট পাওয়া যায়নি!</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {activeTab === "description" && (
-                      <CourseDescription course={course} />
-                    )}
-
-                    {activeTab === "rating" && (
-                      <RatingForm courseId={course?.id} userId={userId} />
-                    )}
                   </div>
-                </div>
-              </div>
-
-              <div className="hidden md:block">
-                <RelatedCourse courses={relatedCourses} />
-              </div>
-              {/* 
-              <AuthorBio />
-              <Review />
-              <MoreCourses /> 
-              */}
-            </div>
-          </div>
-          {/* Sidebar */}
-          <div className="flex-initial w-full relative lg:w-96 z-10">
-            <div className="w-full h-full ">
-              <div className="sticky bg-white top-4">
-                <div className="border border-gray-200 min-h-[80vh]">
-                  <Sidebar
+                ) : isEmbeddedVideo ? (
+                  <div className="aspect-w-16 aspect-h-9 relative">
+                    <iframe
+                      className="w-full h-full"
+                      src={currentVideoUrl}
+                      frameBorder="0"
+                      allowFullScreen
+                      title="Embedded Video"
+                      loading="lazy"
+                    ></iframe>
+                  </div>
+                ) : isDirectVideo ? (
+                  <div className="aspect-w-16 aspect-h-9 relative">
+                    <video className="w-full h-full" controls autoPlay muted>
+                      <source src={currentVideoUrl} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                ) : (
+                  <VdocipherVideoPlayer
+                    chapterId={lesson.id}
+                    title={lesson.title}
+                    courseId={course.id || ""}
+                    nextChapterId={null}
                     videoUrl={currentVideoUrl}
-                    onVideoUrlUpdate={setCurrentVideoUrl}
-                    course={course}
-                    access={!!purchase}
-                    lesson={course.lessons}
-                    userId={userId}
+                    videoStatus={lesson.videoStatus || ""}
+                    isLocked={isLocked}
+                    completeOnEnd={completeOnEnd}
                   />
-                </div>
-              </div>
+                )
+              }
+            </div>
+          )}
+        </div>
+        {/* dynamic course Content */}
+        <div className="min-h-auto md:min-h-auto ">
+          <div className="flex flex-row flex-wrap gap-x-4 items-center justify-between">
+            <h1 className="text-xl font-semibold text-black capitalize truncat">
+              {lesson.title}
+            </h1>
+            <div className="flex  justify-start mt-2 mb-4">
+              <CourseProgressButton
+                course={course}
+                lessonId={lesson.id}
+                courseId={course.id}
+                nextLessonId={nextLesson?.id}
+                isCompleted={userProgress?.isCompleted}
+                userId={userId}
+              />
             </div>
           </div>
-          <div className="block md:hidden">
-            <RelatedCourse courses={relatedCourses} />
+          <div>
+            <div>
+              <TabNavigation
+                tabs={tabs}
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+              />
+              <div className="pt-4">
+                {activeTab === "content" && (
+                  <div className="mx-auto flex max-w-7xl min-h-[150px] items-center justify-between gap-x-6">
+                    <div className="w-full max-w-[51rem]">
+                      <div className="w-full">
+                        {lesson?.textContent ? (
+                          <Preview value={lesson.textContent} />
+                        ) : (
+                          <div className="min-h-[150px] text-gray-400 border border-gray-200 rounded-md flex justify-center items-center">
+                            <p>কোন কনটেন্ট পাওয়া যায়নি!</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {activeTab === "description" && (
+                  <CourseDescription course={course} />
+                )}
+
+                {activeTab === "rating" && (
+                  <RatingForm courseId={course?.id} userId={userId} />
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };

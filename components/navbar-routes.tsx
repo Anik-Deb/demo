@@ -79,15 +79,15 @@ export const NavbarRoutes = () => {
       )}
       <div className="flex gap-x-2 ml-auto">
         {isTeacherPage && userRole === "TEACHER" ? (
-          <button
+          <Button
             onClick={() => handleSwitchRole("STUDENT")}
+            size="sm"
+            variant="outline"
             disabled={loading}
           >
-            <Button size="sm" variant="outline">
-              <LogOut className="h-4 w-4 mr-2" />
-              {loading ? <Loader className="animate-spin h-4 w-4" /> : "Exit"}
-            </Button>
-          </button>
+            <LogOut className="h-4 w-4 mr-2" />
+            {loading ? <Loader className="animate-spin h-4 w-4" /> : "Exit"}
+          </Button>
         ) : (
           <button
             onClick={() => handleSwitchRole("TEACHER")}

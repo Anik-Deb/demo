@@ -8,20 +8,18 @@ import { useRouter } from "next/navigation";
 const StudentSidebarLessons = ({
   item,
   lessonSlug,
-  onVideoUrlUpdate,
   courseSlug,
   index,
   videoUrl,
   isLast, // Receive isLast prop
+  isActive, // Receive isActive prop
 }) => {
   const [activeVideoUrl, setActiveVideoUrl] = useState(videoUrl);
   const router = useRouter();
 
-  const handlePlayClick = (item) => {
+  const handlePlayClick = () => {
     // Update the active video URL
     setActiveVideoUrl(item?.videoUrl);
-    // Optionally update the video URL in the parent component
-    onVideoUrlUpdate(item?.videoUrl);
     // Push the new lesson route
     router.push(`/courses/${courseSlug}/${item?.slug}`);
   };
@@ -31,12 +29,8 @@ const StudentSidebarLessons = ({
       <div
         className={`cursor-pointer flex items-start gap-2 py-3 rounded-md transition-all ${
           !isLast ? "border-b border-gray-100" : "" // Conditionally apply border
-        } ${
-          item.slug === lessonSlug
-            ? "text-teal-700 font-semibold"
-            : "text-gray-600"
-        }`}
-        onClick={() => handlePlayClick(item)}
+        } ${isActive ? "text-teal-700 font-semibold" : "text-gray-600"}`}
+        onClick={() => handlePlayClick()}
       >
         {item.videoUrl !== null ? (
           <PlayCircleIcon
@@ -53,7 +47,7 @@ const StudentSidebarLessons = ({
         )}
 
         <div className="text-sm flex gap-2">
-          <span className="min-w-max text-nowrap">Lesson {index + 1}:</span>
+          {/* <span className="min-w-max text-nowrap">Lesson {index + 1}:</span> */}
           <p
             className="text-sm capitalize"
             dangerouslySetInnerHTML={{

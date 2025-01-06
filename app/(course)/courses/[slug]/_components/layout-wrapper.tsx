@@ -15,13 +15,11 @@ export default function LayoutWrapper({ children, hasCourseAccess }) {
             <main className="min-h-screen">{children}</main>
           </div>
           <div className="flex-initial w-full lg:w-96 z-10">
-            {/* <div className="h-full w-full lg:-mt-[380px] bg-white border border-gray-200 shadow-sm p-4 lg:p-8"> */}
             {/* call sidebar */}
             <div className="sticky top-4 min-h-max w-full lg:-mt-[350px] bg-white  shadow-lg">
               <Sidebar />
               {/* sidebar */}
             </div>
-            {/* </div> */}
           </div>
         </div>
       </div>

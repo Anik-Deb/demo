@@ -46,16 +46,17 @@ export async function POST(req: NextRequest) {
 
       console.log("Purchase record updated!");
 
-      // Optionally, update teacher's revenue
       const course = await db.course.findUnique({
         where: { id: courseId },
       });
 
       if (course) {
         const teacherRevenueData = {
-          userId: course.teacherId, // Assuming course.teacherId is the teacher's ID
+          userId: userId,
+          teacherId: course.teacherId,
+          courseId: courseId,
           purchaseId: updatedPurchase.id,
-          amountEarned: 0, // Free course, no revenue
+          amountEarned: 0,
         };
 
         await db.teacherRevenue.create({
@@ -91,6 +92,7 @@ export async function POST(req: NextRequest) {
       const teacherRevenueData = {
         userId: course.teacherId, // Assuming course.teacherId is the teacher's ID
         purchaseId: purchase.id,
+        teacherId: course.teacherId,
         amountEarned: 0, // Free course, no revenue
       };
 

@@ -42,12 +42,12 @@ export function CategoryPagination({
   const courseUpdatesMap = {};
 
   // Add completedCourses to the map
-  completedCourses.forEach((course) => {
+  completedCourses?.forEach((course) => {
     courseUpdatesMap[course.id] = course; // Assuming 'id' is the unique identifier
   });
 
   // Add coursesInProgress to the map
-  coursesInProgress.forEach((course) => {
+  coursesInProgress?.forEach((course) => {
     courseUpdatesMap[course.id] = course; // Assuming 'id' is the unique identifier
   });
 
@@ -57,7 +57,7 @@ export function CategoryPagination({
   );
 
   // Pagination logic
-  const itemsPerPage = 4;
+  const itemsPerPage = 12;
   const totalItems = updatedItems.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
@@ -85,7 +85,6 @@ export function CategoryPagination({
     <div>
       {/* Pass updated items to CoursesList */}
       <CoursesList userId={userId} items={currentItems} />
-
       {/* Pagination */}
       {totalItems > itemsPerPage && (
         <div className="">

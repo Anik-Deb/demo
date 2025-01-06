@@ -8,8 +8,8 @@ import StudentSidebarLessons from "./student-sidebar-lessons";
 export default function StudentSidebar({
   lesson,
   videoUrl,
-  onVideoUrlUpdate,
   courseSlug,
+  currentLessonSlug
 }) {
   const { lessonSlug } = useParams(); // This works because the component is now client-side.
 
@@ -25,9 +25,9 @@ export default function StudentSidebar({
           item={item}
           lessonSlug={lessonSlug}
           index={index}
-          onVideoUrlUpdate={onVideoUrlUpdate}
           courseSlug={courseSlug}
           videoUrl={videoUrl}
+          isActive={lesson.slug === currentLessonSlug}
           isLast={index === lesson.length - 1}
         />
       ))}

@@ -74,6 +74,7 @@ export default function VdocipherVideoForm({
       }
     }
   };
+  // console.log('lessonid');
 
   // Function to refresh video status manually
   const refreshVideoStatus = async () => {

@@ -1,83 +1,59 @@
-//@ts-nocheck
+// @ts-nocheck
 
-import { db } from "@/lib/db";
+import axios from "axios"; // Import axios
 import { getServerUserSession } from "@/lib/getServerUserSession";
-import { notFound } from "next/navigation";
+import { VdocipherVideoPlayer } from "../chapters/[chapterId]/_components/vdocipher-video-player";
+import Sidebar from "../_components/sidebar";
+import CourseDescription from "../_components/course-description";
+import { LessonContent } from "../_components/LessonContent";
+import { getCourseBySlug } from "@/actions/get-course-by-slug";
+import { getRelatedCourses } from "@/actions/get-related-courses";
+import { redirect } from "next/navigation";
+import { checkCourseAccess } from "@/actions/get-course-access";
+import { getLesson } from "@/lib/utils/GetLessons";
 
-const getLesson = async (courseSlug, lessonSlug) => {
-  const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/courses/${courseSlug}/${lessonSlug}`;
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new error("Failed to get lesson");
-    }
-    return {
-      error: false,
-      lesson: await response.json(),
-    };
-  } catch (error) {
-    console.error("lesson page", error);
-    return {
-      error: true,
-      message: error.message,
-    };
-  }
-  // call api
-};
-
-// Check course access via the new API route
-const checkCourseAccess = async (courseSlug) => {
-  const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/courses/access`;
-  try {
-    const response = await fetch("/api/courses/access", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ courseSlug }),
-    });
-
-    if (!response.ok) {
-      const data = await response.json();
-      return {
-        access: false,
-        message: data.message || "Access denied",
-      };
-    }
-
-    const data = await response.json();
-    return {
-      access: data.access,
-    };
-  } catch (error) {
-    console.error("Error checking course access via API", error);
-    return {
-      access: false,
-      message: "Error occurred while checking access",
-    };
-  }
-};
-
-export default async function LessonPage({ params }) {
+// Lesson page component
+export default async function page({ params }) {
   const { userId } = await getServerUserSession();
   const { slug, lessonSlug } = params;
-  const data = await getLesson(slug, lessonSlug);
-  if (data.error) {
-    notFound();
+  // Fetch lesson, course access, and course data in parallel
+  const [lessonResponse, accessResponse, courseResponse] = await Promise.all([
+    getLesson(lessonSlug, userId), // Lesson data
+    checkCourseAccess(slug, userId), // Course access data
+    getCourseBySlug(slug, userId), // Course slug data
+  ]);
+  if (lessonResponse.error) {
+    return <div>Lesson not found</div>;
   }
-  const lesson = data.lesson;
+  
+  const { lesson, course, attachments, nextLesson, userProgress, purchase } =
+    lessonResponse.data;
 
-  // Call the API to check if the user has access to the course
-  const accessResponse = await checkCourseAccess(courseSlug);
   const hasCourseAccess = accessResponse.access;
-  if (!hasCourseAccess || !lesson.preview) {
-    return <div>{accessResponse.message || "Unauthorized access"}</div>;
+  if (!hasCourseAccess) redirect(`/courses/${slug}`);
+
+
+  let relatedCourses = [];
+  if (userId) {
+    const relatedCoursesPromise = getRelatedCourses({
+      userId,
+      categoryId: courseResponse.categoryId,
+      currentCourseId: courseResponse.id,
+    });
+    relatedCourses = await relatedCoursesPromise;
   }
 
   return (
     <div>
-      <div> Lesson Content</div>
-      <div> Lesson Sidebar</div>
+      <LessonContent
+        lesson={lesson}
+        course={course}
+        nextLesson={nextLesson}
+        userProgress={userProgress}
+        purchase={purchase}
+        userId={userId}
+        relatedCourses={relatedCourses}
+      />
     </div>
   );
 }

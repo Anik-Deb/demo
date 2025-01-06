@@ -81,7 +81,11 @@ const URLInputForm: React.FC<{
       if (videoId) {
         try {
           const response = await fetch(
-            `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=contentDetails&key=${process.env.YOUTUBE_API_KEY}`
+            `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=contentDetails&key=${
+              process.env.YOUTUBE_API_KEY
+                ? process.env.YOUTUBE_API_KEY
+                : "AIzaSyCPR91DH0aksFRfSpiqLX0c5G7e75OO_Ao"
+            }`
           );
 
           const data = await response.json();
@@ -112,7 +116,11 @@ const URLInputForm: React.FC<{
             `https://api.vimeo.com/videos/${videoId}`,
             {
               headers: {
-                Authorization: `Bearer ${process.env.VIMEO_ACCESS_TOKEN}`,
+                Authorization: `Bearer ${
+                  process.env.VIMEO_ACCESS_TOKEN
+                    ? process.env.VIMEO_ACCESS_TOKEN
+                    : "839f9b070442dce17e5944f158f1a5bb"
+                }`,
               },
             }
           );
@@ -121,7 +129,7 @@ const URLInputForm: React.FC<{
 
           if (data && data.duration) {
             setDuration(data.duration);
-            return data.duration; // Fix to use data.duration
+            return data.duration; 
           } else {
             setError("Video not found.");
           }
@@ -161,9 +169,7 @@ const URLInputForm: React.FC<{
     try {
       let videoDuration = await getVideoDuration(data?.videoUrl);
 
-      console.log("videoDuration", videoDuration);
-
-      await axios.patch(`/api/courses/${courseId}/lessons/${lessonId}`, {
+      const result = await axios.patch(`/api/courses/${courseId}/lessons/${lessonId}`, {
         videoUrl: data.videoUrl,
         duration: videoDuration,
       });
@@ -215,7 +221,7 @@ const URLInputForm: React.FC<{
                   {errors.videoUrl.message}
                 </span>
               )}
-              <div className="flex justify-end mt-2">
+              <div className="flex mt-2">
                 <Button
                   onClick={handleSubmit(onSubmit)}
                   disabled={loading || isSubmitting}

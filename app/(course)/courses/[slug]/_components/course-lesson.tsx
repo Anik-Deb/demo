@@ -24,7 +24,6 @@ export default function CourseLesson({ course }) {
   const handleLessonClick = (lesson) => {
     setSelectedLesson(lesson);
   };
-  console.log("course.lessons");
 
   const visibleLessonCount = 10;
   const [visibleLessons, setVisibleLessons] = useState(visibleLessonCount); // Start with 10 lessons visible
@@ -35,7 +34,6 @@ export default function CourseLesson({ course }) {
       setVisibleLessons(visibleLessonCount); // Show only the first 10 lessons
     }
   };
-  // console.log(course.lessons);
   return (
     <div className="my-6">
       <h1 className="text-2xl font-bold mb-4">Course Lessons</h1>

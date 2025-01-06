@@ -1,4 +1,7 @@
 // @ts-nocheck
+
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -6,30 +9,10 @@ import { convertNumberToBangla } from "@/lib/convertNumberToBangla";
 import { CourseProgress } from "./course-progress";
 import { Preview } from "./preview";
 import { Play } from "lucide-react";
+import { SingleCardButton } from "./single-card-button";
+import { useEffect, useState } from "react";
 
-
-// Define the component as an async function
-export default async function SingleCourse({
-  course,
-  userId,
-  fetchProgress = true,
-}) {
-  let userProgress = [];
-
-  if (userId && fetchProgress) {
-    // Only call the API if userId is present
-    const apiUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/user/userprogress?userId=${userId}&courseId=${course.id}`;
-
-    const response = await fetch(apiUrl);
-
-    if (!response.ok) {
-      console.error("Error fetching user progress:", response);
-      throw new Error("Error fetching user progress");
-    }
-
-    userProgress = await response.json();
-  }
-
+export default function SingleCourse({ course, userId, fetchProgress = true }) {
   const {
     id,
     slug,
@@ -41,23 +24,45 @@ export default async function SingleCourse({
     progress,
     purchases,
     lessons,
-  } = course; // Assume `course` is fetched from a database or API based on courseId
+  } = course;
 
-  // console.log("price", prices);
+  const [userProgress, setUserProgress] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const offer = 35; // This will come from the database
-
-  // Check if the course is purchased and user is authenticated
   const isPurchased = purchases && purchases.length > 0;
-
   const isAuthenticated = !!userId;
 
-  // Check for the completed lessons and find the next lesson
+  useEffect(() => {
+    if (userId && fetchProgress && course.id) {
+      setLoading(true);
+      const apiUrl = `/api/user/userprogress?userId=${userId}&courseId=${course.id}`;
+
+      fetch(apiUrl, { cache: "no-store" })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Error fetching user progress");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setUserProgress(data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching user progress:", error);
+          // Handle error, possibly show a message to the user
+        });
+    }
+  }, [userId, course.id, fetchProgress]);
+
   const completedLessonIds = userProgress.map((progress) => progress.lessonId);
   const nextLesson = lessons.find(
     (lesson) => lesson.isPublished && !completedLessonIds.includes(lesson.id)
   );
+
   const nextLessonSlug = nextLesson ? nextLesson.slug : null;
+
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col">
       <div className="relative border group">
@@ -85,12 +90,11 @@ export default async function SingleCourse({
           </div>
         </Link>
       </div>
-
       <div className="p-4 mt-2">
-        <div className="flex items-center gap-x-3 text-xs">
+        <div className="flex flex-row justify-between items-center w-full flex-wrap gap-2 text-xs">
           <Link
             href={`/courses/category?categoryId=${course?.category?.id}`}
-            className="relative bg-blue-100 text-blue-800 text-xs  font-medium rounded-[44px] flex items-center gap-1 px-3 py-1"
+            className="relative bg-blue-100 text-blue-800 text-xs font-medium rounded-[44px] flex items-center gap-1 px-3 py-1"
           >
             {category.name}
           </Link>
@@ -118,97 +122,14 @@ export default async function SingleCourse({
           />
         </div>
       </div>
-      {/* price */}
-      <div className="p-4 mt-auto">
-        {!progress && (
-          <div className="text-left md:p-0 pt-0">
-            {prices?.length > 0 ? (
-              <>
-                {prices[0]?.isFree ? (
-                  <div className="text-md font-semibold text-gray-800">
-                    <span>Free</span>
-                  </div>
-                ) : (
-                  <div>
-                    {prices[0].discountedAmount ? (
-                      <div className="flex flex-row items-center justify-between text-left">
-                        <div className="font-bold text-gray-800">
-                          <span className="text-lg">
-                            ৳{prices[0].discountedAmount}
-                          </span>
-                          <span
-                            className={`text-sm text-gray-500 ${
-                              prices[0].discountedAmount
-                                ? "line-through ml-2"
-                                : ""
-                            }`}
-                          >
-                            {/* previous regular price */}৳
-                            {prices[0].regularAmount}
-                          </span>
-                        </div>
-
-                        <div className="text-xs text-[#F02D00] capitalize font-semibold">
-                          Offer Expires on:{" "}
-                          {new Date(
-                            prices[0].discountExpiresOn
-                          ).toLocaleDateString()}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="font-bold text-gray-800">
-                        <span className="text-lg">
-                          ৳{prices[0].regularAmount}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            ) : null}
-          </div>
-        )}
-
-        {isAuthenticated && progress !== null ? (
-          <>
-            <div className="mb-4">
-              <CourseProgress
-                variant={progress === 100 ? "success" : "default"}
-                size="sm"
-                value={progress}
-              />
-            </div>
-            {nextLessonSlug ? (
-              <Link href={`/courses/${slug}/${nextLessonSlug}`}>
-                <Button className="w-full h-12 text-lg bg-teal-500 text-white font-bold py-2 rounded flex items-center justify-center hover:bg-teal-600">
-                  চালিয়ে যান
-                </Button>
-              </Link>
-            ) : (
-              <Link
-                href={`/courses/${slug}/${lessons[0]?.slug}`}
-                className="mt-4"
-              >
-                <Button className="w-full h-12 text-lg bg-teal-500 text-white font-bold py-2 rounded flex items-center justify-center hover:bg-teal-500 hover:opacity-80">
-                  চালিয়ে যান
-                </Button>
-              </Link>
-            )}
-          </>
-        ) : (
-          <div>
-            <div className="flex items-center text-gray-500 mb-4"></div>
-            <Link href={`/courses/${slug}`}>
-              <Button
-                type="button"
-                className="w-full h-12 bg-teal-500 text-white font-bold py-2 rounded flex items-center justify-center hover:bg-teal-500 hover:opacity-80"
-              >
-                <span className="ml-2 text-lg">বিস্তারিত দেখুন</span>
-              </Button>
-            </Link>
-          </div>
-        )}
-      </div>
+      <SingleCardButton
+        isAuthenticated={isAuthenticated}
+        progress={progress}
+        nextLessonSlug={nextLessonSlug}
+        slug={slug}
+        lessons={lessons}
+        loading={loading}
+      />
     </div>
   );
 }

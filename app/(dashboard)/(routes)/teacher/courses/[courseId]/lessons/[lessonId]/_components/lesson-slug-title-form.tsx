@@ -58,19 +58,27 @@ export const LessonSlugTitleForm = ({
 
   const { isSubmitting, isValid } = form.formState;
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setLoading(true); // Set loading to true
-    try {
-      await axios.patch(`/api/courses/${courseId}/lessons/${lessonId}`, values);
-      toast.success("Lesson updated");
-      toggleEdit();
-      router.refresh();
-    } catch {
+const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  setLoading(true); // Set loading to true
+
+  try {
+    await axios.patch(`/api/courses/${courseId}/lessons/${lessonId}`, values);
+
+    toast.success("Lesson updated");
+    toggleEdit();
+    router.refresh();
+  } catch (error) {
+    // Ensure error is defined and has a response
+    if (axios.isAxiosError(error) && error.response?.status === 500) {
+      toast.error("This slug is preoccupied. Please use a different slug.");
+    } else {
       toast.error("Something went wrong");
-    } finally {
-      setLoading(false); // Reset loading state
     }
-  };
+  } finally {
+    setLoading(false); // Reset loading state
+  }
+};
+
 
   return (
     <div className="mt-6 border bg-slate-100 rounded-md p-4">

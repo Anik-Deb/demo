@@ -1,6 +1,7 @@
 //@ts-nocheck
 import { db } from "@/lib/db";
 import { getServerUserSession } from "@/lib/getServerUserSession";
+import { duration } from "moment";
 import { NextResponse } from "next/server";
 
 // Get
@@ -117,11 +118,32 @@ export async function PATCH(req, { params }) {
       },
     });
 
+    await updateCourseTotalDuration(params.courseId);
+
     return NextResponse.json(updatedLesson);
   } catch (error) {
     console.error("[COURSES_LESSON_ID]", error);
     return new NextResponse("Internal Server Error", { status: 500 });
   }
+}
+
+async function updateCourseTotalDuration(courseId: string) {
+  console.log("duration from updateCourseTotalDuration", duration);
+
+  const lessons = await db.lesson.findMany({
+    where: { courseId },
+    select: { duration: true },
+  });
+
+  const totalDuration = lessons.reduce(
+    (sum, lesson) => sum + (lesson.duration || 0),
+    0
+  );
+
+  await db.course.update({
+    where: { id: courseId },
+    data: { totalDuration },
+  });
 }
 
 // Delete

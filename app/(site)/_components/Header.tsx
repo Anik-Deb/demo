@@ -65,7 +65,7 @@ export default function Header() {
               </button>
               <Link
                 href="/dashboard"
-                className="block rounded-lg px-5 py-2 font-semibold bg-[#0D9488] text-base text-white hover:bg-primary-500 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                className="block rounded-lg px-5 py-2 font-semibold bg-[#0D9488] hover:bg-teal-500 text-base text-white hover:bg-primary-500 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
               >
                 ড্যাশবোর্ড
               </Link>
@@ -73,7 +73,7 @@ export default function Header() {
           ) : (
             <Link
               href="/signin"
-              className="block rounded-lg px-5 py-2 font-semibold bg-[#0D9488] text-base text-white hover:bg-primary-500 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+              className="block rounded-lg px-5 py-2 font-semibold bg-[#0D9488] hover:bg-teal-500 text-base text-white hover:bg-primary-500 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             >
               লগইন
             </Link>
@@ -143,7 +143,7 @@ export default function Header() {
                     </button>
                     <Link
                       href="/dashboard"
-                      className="block rounded-lg px-5 py-2 font-semibold bg-[#0D9488] text-xl text-white hover:bg-primary-500 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                      className="block rounded-lg px-5 py-2 font-semibold bg-[#0D9488] hover:bg-teal-500 text-xl text-white hover:bg-primary-500 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                     >
                       ড্যাশবোর্ড
                     </Link>
@@ -151,7 +151,7 @@ export default function Header() {
                 ) : (
                   <Link
                     href="/signin"
-                    className="block rounded-lg px-5 py-2 font-semibold bg-[#0D9488] text-base text-white hover:bg-primary-500 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                    className="block rounded-lg px-5 py-2 font-semibold bg-[#0D9488] hover:bg-teal-500 text-base text-white hover:bg-primary-500 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                   >
                     লগইন
                   </Link>

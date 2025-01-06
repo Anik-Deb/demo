@@ -104,14 +104,14 @@ export const LessonsForm = ({ initialData, courseId }: LessonsFormProps) => {
         </div>
       )}
       <div className="font-medium flex items-center justify-between">
-        Course chapters
+        Lessons
         <Button onClick={toggleCreating} variant="ghost">
           {isCreating ? (
             <>Cancel</>
           ) : (
             <>
               <PlusCircle className="h-4 w-4 mr-2" />
-              Add a chapter
+              New Lesson
             </>
           )}
         </Button>

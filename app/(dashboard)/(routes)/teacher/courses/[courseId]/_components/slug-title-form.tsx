@@ -73,7 +73,7 @@ export const SlugTitleForm = ({
     <div className="mt-6 border bg-slate-100 rounded-md p-4">
       <div className="font-medium flex items-center justify-between">
         Course Slug title
-        <Button onClick={toggleEdit} variant="ghost">
+        {/* <Button onClick={toggleEdit} variant="ghost">
           {isEditing ? (
             <>Cancel</>
           ) : (
@@ -82,7 +82,7 @@ export const SlugTitleForm = ({
               Edit slug title
             </>
           )}
-        </Button>
+        </Button> */}
       </div>
       {!isEditing && <p className="text-sm mt-2">{initialData?.slug}</p>}
       {isEditing && (

@@ -4,7 +4,7 @@
 
 import { z } from "zod";
 import { signIn, useSession } from "next-auth/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Link from "next/link";
@@ -20,21 +20,33 @@ const signInSchema = z.object({
 });
 
 export default function SignIn() {
+
+
   const { data: session, status } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const [redirectUrl, setRedirectUrl] = useState("/dashboard");
+  const router = useRouter();
   const [isFormValid, setIsFormValid] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
-  const router = useRouter();
+
+  // Use useEffect to safely access window
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const redirect = searchParams.get("redirect");
+    if (redirect) {
+      setRedirectUrl(redirect);
+    }
+  }, []);
 
   // Redirect if already authenticated
   useEffect(() => {
     if (status === "authenticated") {
-      router.push("/dashboard");
+      router.push(redirectUrl);
     }
-  }, [status, router]);
+  }, [status, redirectUrl, router]);
 
   // Validate the form on every input change
   useEffect(() => {
@@ -83,7 +95,7 @@ export default function SignIn() {
         }
       } else {
         toast.success("Logged in successfully!");
-        router.push("/dashboard");
+        router.push(redirectUrl); // Redirect to the previous page after login
       }
     } catch (err) {
       setIsSubmitting(false);
@@ -109,89 +121,93 @@ export default function SignIn() {
   // Render the login form if the user is not authenticated
   if (status === "unauthenticated") {
     return (
-      <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
-        <div className="bg-white p-8 shadow-lg rounded-lg max-w-md w-full">
-          <div className="pb-6 flex justify-center">
-            <Link href={`${process.env.NEXT_PUBLIC_APP_URL}` || "#"}>
-              <span className="sr-only">প্রায়োগীক</span>
-              <Image
-                src="/prayogik-logo.png"
-                width={130}
-                height={130}
-                className="h-auto w-[170px]"
-                alt="prayogik logo"
-                priority
-              />
-            </Link>
-          </div>
-          <h1 className="text-xl font-bold mb-6 text-center">Sign In</h1>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 w-full p-2 border border-gray-300 rounded-md"
-              />
-              {hasSubmitted && errors.email && (
-                <p className="text-red-500 text-sm">{errors.email}</p>
-              )}
-            </div>
-            <div>
-              <div className="flex justify-between">
-                <label className="block text-sm font-medium text-gray-700">
-                  Password
-                </label>
-                <Link
-                  href="/forgot-password"
-                  className="font-medium text-blue-500 hover:text-blue-600 text-sm"
-                >
-                  Forgot password?
+      <div className="">
+        <Suspense fallback={<p>loading...</p>}>
+          <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
+            <div className="bg-white p-8 shadow-lg rounded-lg max-w-md w-full">
+              <div className="pb-6 flex justify-center">
+                <Link href={`${process.env.NEXT_PUBLIC_APP_URL}` || "#"}>
+                  <span className="sr-only">প্রায়োগীক</span>
+                  <Image
+                    src="/prayogik-logo.png"
+                    width={130}
+                    height={130}
+                    className="h-auto w-[170px]"
+                    alt="prayogik logo"
+                    priority
+                  />
                 </Link>
               </div>
+              <h1 className="text-xl font-bold mb-6 text-center">Sign In</h1>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="mt-1 w-full p-2 border border-gray-300 rounded-md"
+                  />
+                  {hasSubmitted && errors.email && (
+                    <p className="text-red-500 text-sm">{errors.email}</p>
+                  )}
+                </div>
+                <div>
+                  <div className="flex justify-between">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Password
+                    </label>
+                    <Link
+                      href="/forgot-password"
+                      className="font-medium text-blue-500 hover:text-blue-600 text-sm"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
 
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 w-full p-2 border border-gray-300 rounded-md"
-              />
-              {hasSubmitted && errors.password && (
-                <p className="text-red-500 text-sm">{errors.password}</p>
-              )}
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="mt-1 w-full p-2 border border-gray-300 rounded-md"
+                  />
+                  {hasSubmitted && errors.password && (
+                    <p className="text-red-500 text-sm">{errors.password}</p>
+                  )}
+                </div>
+                {hasSubmitted && errors.form && (
+                  <p className="text-red-500 text-sm">{errors.form}</p>
+                )}
+                <button
+                  type="submit"
+                  disabled={!isFormValid || isSubmitting}
+                  className={`w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition ${
+                    !isFormValid || isSubmitting
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
+                >
+                  {isSubmitting ? "Signing In..." : "Sign In"}
+                </button>
+              </form>
+              <hr className="my-4" />
+              <button
+                onClick={() => signIn("google", { callbackUrl: redirectUrl })}
+                className="w-full bg-red-500 text-white p-2 rounded-md hover:bg-red-600 transition"
+              >
+                Sign in with Google
+              </button>
+              <p className="text-center mt-4">
+                {`Don't have an account?`}{" "}
+                <a href="/signup" className="text-blue-500 hover:underline">
+                  Sign Up
+                </a>
+              </p>
             </div>
-            {hasSubmitted && errors.form && (
-              <p className="text-red-500 text-sm">{errors.form}</p>
-            )}
-            <button
-              type="submit"
-              disabled={!isFormValid || isSubmitting}
-              className={`w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition ${
-                !isFormValid || isSubmitting
-                  ? "opacity-50 cursor-not-allowed"
-                  : ""
-              }`}
-            >
-              {isSubmitting ? "Signing In..." : "Sign In"}
-            </button>
-          </form>
-          <hr className="my-4" />
-          <button
-            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            className="w-full bg-red-500 text-white p-2 rounded-md hover:bg-red-600 transition"
-          >
-            Sign in with Google
-          </button>
-          <p className="text-center mt-4">
-            {`Don't have an account?`}{" "}
-            <a href="/signup" className="text-blue-500 hover:underline">
-              Sign Up
-            </a>
-          </p>
-        </div>
+          </div>
+        </Suspense>
       </div>
     );
   }

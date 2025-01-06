@@ -1,3 +1,4 @@
+import React from "react";
 import AuthProvider from "@/components/AuthProvider";
 import { ConfettiProvider } from "@/components/providers/confetti-provider";
 import { ToastProvider } from "@/components/providers/toaster-provider";
@@ -19,14 +20,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <AuthProvider>
-        <body className={noto_serif_bengali.className}>
-          <div>{children}</div>
-          <ConfettiProvider />
-          <ToastProvider />
-         
-        </body>
-      </AuthProvider>
+
+        <AuthProvider>
+          <body className={noto_serif_bengali.className}>
+            <div>{children}</div>
+            <ConfettiProvider />
+            <ToastProvider />
+          </body>
+        </AuthProvider>
+     
     </html>
   );
 }

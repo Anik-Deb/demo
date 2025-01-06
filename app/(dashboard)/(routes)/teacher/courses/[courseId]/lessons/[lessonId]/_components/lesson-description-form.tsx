@@ -94,7 +94,7 @@ export const LessonDescriptionForm = ({
           ) : (
             <>
               <Pencil className="h-4 w-4 mr-2" />
-              Edit description
+              Edit Content
             </>
           )}
         </Button>
@@ -123,6 +123,7 @@ export const LessonDescriptionForm = ({
           <Button
             disabled={!textContent || isSubmitting || loading}
             onClick={handleTextContentSubmit}
+            className="mt-2"
           >
             {loading ? <Loader className="animate-spin h-4 w-4" /> : "Save"}
           </Button>

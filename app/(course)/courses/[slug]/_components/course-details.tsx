@@ -1,6 +1,7 @@
 // @ts-nocheck
 // Import required components and icons
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { formatDuration } from "@/lib/formatDuration";
 import { DocumentTextIcon } from "@heroicons/react/24/outline";
 import { FileIcon, CodeIcon } from "lucide-react";
 
@@ -9,51 +10,55 @@ import { FileIcon, CodeIcon } from "lucide-react";
 const CourseInclusions = ({ course }) => {
   let courseDuration = course?.totalDuration / 60;
   // console.log("includes page");
+
+  let formattedDuration = formatDuration(courseDuration);
   return (
-    <div className="md:py-4 pt-6">
+    <>
       {courseDuration !== 0 && (
-        <Card className="p-0 border-none shadow-none">
-          <CardContent className="flex items-start p-0">
-            {/* Left section for video and coding exercises */}
-            <div className="mr-10">
-              <CardHeader className="p-0">
-                {/* Title for course inclusions */}
-                <h2 className="text-xl font-bold mb-4">
-                  This course includes:
-                </h2>
-              </CardHeader>
+        <div className="md:py-4 pt-6">
+          <Card className="p-0 border-none shadow-none">
+            <CardContent className="flex items-start p-0">
+              {/* Left section for video and coding exercises */}
+              <div className="mr-10">
+                <CardHeader className="p-0">
+                  {/* Title for course inclusions */}
+                  <h1 className="text-2xl font-bold mb-6 text-gray-800">
+                    This Course Includes
+                  </h1>
+                </CardHeader>
 
-              {/* List of course items */}
-              <ul className="space-y-2">
-                {/* Each list item includes an icon and description */}
-                <li className="flex gap-2 items-center">
-                  <FileIcon className="w-4 h-4 stroke-gray-400" />
-                  <span>
-                    {courseDuration ? courseDuration?.toFixed(2) : 0} hours
-                    on-demand video
-                  </span>
-                </li>
-                <li className="flex gap-2 items-center">
-                  <CodeIcon className="w-4 h-4 stroke-gray-400" />
-                  <span>Quiz</span>
-                </li>
-              </ul>
-            </div>
+                {/* List of course items */}
+                <ul className="space-y-2">
+                  {/* Each list item includes an icon and description */}
+                  {formattedDuration && (
+                    <li className="flex gap-2 items-center">
+                      <FileIcon className="w-4 h-4 stroke-gray-400" />
+                      <span>{formattedDuration} on-demand video</span>
+                    </li>
+                  )}
 
-            {/* Right section for assignments and other inclusions */}
-            <div>
-              {/* Additional course items */}
-              <ul className="space-y-2 mt-12">
-                <li className="flex gap-2 items-center">
-                  <CodeIcon className="w-4 h-4 stroke-gray-400" />
-                  <span>Assignments</span>
-                </li>
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
+                  <li className="flex gap-2 items-center">
+                    <CodeIcon className="w-4 h-4 stroke-gray-400" />
+                    <span>Quiz</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Right section for assignments and other inclusions */}
+              <div>
+                {/* Additional course items */}
+                <ul className="space-y-2 mt-12">
+                  <li className="flex gap-2 items-center">
+                    <CodeIcon className="w-4 h-4 stroke-gray-400" />
+                    <span>Assignments</span>
+                  </li>
+                </ul>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
-    </div>
+    </>
   );
 };
 

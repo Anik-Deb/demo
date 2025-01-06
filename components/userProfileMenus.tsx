@@ -26,7 +26,10 @@ export default function UserProfileMenus({ session }) {
           {displayName}
         </MenubarTrigger>
         <MenubarContent className="mr-2 min-w-[140px]">
-          <MenubarItem className="cursor-pointer" onClick={() => signOut()}>
+          <MenubarItem
+            className="cursor-pointer"
+            onClick={() => signOut({ callbackUrl: "/" })}
+          >
             Logout
           </MenubarItem>
         </MenubarContent>

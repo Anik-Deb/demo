@@ -3,9 +3,9 @@
 import { db } from "@/lib/db";
 import { getServerUserSession } from "@/lib/getServerUserSession";
 
-export async function checkCourseAccess(courseSlug: string) {
+export async function checkCourseAccess(courseSlug: string,userId:string) {
   try {
-    const { userId } = await getServerUserSession();
+    // const { userId } = await getServerUserSession();
 
     if (!courseSlug || !userId) {
       return { access: false, error: "Unauthorized" };

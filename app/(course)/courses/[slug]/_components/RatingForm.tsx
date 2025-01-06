@@ -1,52 +1,38 @@
 "use client";
 
-import { useEffect, useState, FormEvent } from "react";
-import { Button } from "@/components/ui/button"; // Ensure Button component is correctly imported
+import React, { useEffect, useState, FormEvent } from "react";
+import { Button } from "@/components/ui/button";
 import { Loader } from "lucide-react";
-import { toast } from "react-hot-toast"; // Import toast correctly
+import { toast } from "react-hot-toast";
 
 interface RatingFormProps {
   courseId: string;
   userId: string;
+  initialRating: number | null; // Added new prop to receive initial rating
+  onRatingSubmit: (rating: number) => Promise<void>; // Function to call when submitting the rating
 }
 
-const RatingForm: React.FC<RatingFormProps> = ({ courseId, userId }) => {
-  const [ratingValue, setRatingValue] = useState<number>(0);
+const RatingForm: React.FC<RatingFormProps> = ({
+  courseId,
+  userId,
+  initialRating,
+  onRatingSubmit,
+}) => {
+  const [ratingValue, setRatingValue] = useState<number>(initialRating || 0);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [hasSubmitted, setHasSubmitted] = useState<boolean>(false); // To track submission status
 
-  // Fetch existing rating when the component mounts
+  // Sync initial rating when it changes
   useEffect(() => {
-    const fetchRating = async () => {
-      try {
-        const response = await fetch(
-          `/api/courses/ratings?courseId=${courseId}&userId=${userId}`
-        );
+    if (initialRating !== null) {
+      setRatingValue(initialRating);
+    }
+  }, [initialRating]);
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Error fetching rating");
-        }
-
-        const ratingData = await response.json();
-        if (ratingData) {
-          setRatingValue(ratingData.value); // Pre-set the rating value
-          setHasSubmitted(true); // Mark that the user has submitted a rating
-        }
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch existing rating");
-      }
-    };
-
-    fetchRating();
-  }, [courseId, userId]);
-
-  // Function to handle submitting the rating
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setError(null); // Reset error state
+    setError(null);
 
     // Validate rating value
     if (ratingValue < 1 || ratingValue > 5) {
@@ -55,37 +41,14 @@ const RatingForm: React.FC<RatingFormProps> = ({ courseId, userId }) => {
       return;
     }
 
-    try {
-      const response = await fetch("/api/courses/ratings", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          value: ratingValue,
-          courseId,
-          userId,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Error submitting rating");
-      }
-
-      // Show success toast notification
-      toast.success("Rating submitted successfully!");
-      setHasSubmitted(true); // Mark as submitted
-    } catch (err: any) {
-      setError(err.message || "Something went wrong!");
-    } finally {
-      setLoading(false);
-    }
+    // Call the callback function to submit the rating
+    await onRatingSubmit(ratingValue);
+    toast.success("Rating submitted successfully!");
+    setLoading(false);
   };
 
-  // Function to handle rating click
   const handleRatingClick = (value: number) => {
-    setRatingValue(value); // Set the rating value when a star is clicked
+    setRatingValue(value);
   };
 
   return (
@@ -117,8 +80,6 @@ const RatingForm: React.FC<RatingFormProps> = ({ courseId, userId }) => {
             >
               {loading ? (
                 <Loader className="animate-spin h-4 w-4" />
-              ) : hasSubmitted ? (
-                "Submit again"
               ) : (
                 "Submit Rating"
               )}

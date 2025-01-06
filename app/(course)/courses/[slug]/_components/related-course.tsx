@@ -1,5 +1,6 @@
 // @ts-nocheck
 
+import { formatDuration } from "@/lib/formatDuration";
 import { Item } from "@radix-ui/react-accordion";
 import { StarFilledIcon } from "@radix-ui/react-icons";
 import { Play, User2, Users2Icon } from "lucide-react";
@@ -19,7 +20,7 @@ export default function RelatedCourse({ courses }) {
           <p>No related courses found at the moment.</p>
         </div>
       ) : (
-        <div className="grid md:grid-cols-1 grid-cols-2 gap-2">
+        <div className="grid md:grid-cols-1 grid-cols-1 gap-2">
           {courses.map((item, index) => (
             <Link key={index} href={`/courses/${item.slug}`}>
               <div className="bg-white md:min-h-0 min-h-[280px] mb-2 border hover:shadow border-gray-200 rounded-lg flex md:flex-row flex-col md:items-center md:p-2 gap-4 transition justify-between">
@@ -31,7 +32,7 @@ export default function RelatedCourse({ courses }) {
                       alt={`Course ${index + 1}`}
                       fill
                       className="rounded-lg md:rounded-b-lg rounded-b-none object-cover"
-                      priority={index === 0} // Prioritize the first image for faster loading
+                      priority
                     />
                     <div className="absolute flex items-center justify-center transition-all duration-300 hover:bg-[#0000003b] w-full h-full">
                       <div className="bg-[#727374ab] p-2 rounded-full">
@@ -45,10 +46,10 @@ export default function RelatedCourse({ courses }) {
                       {item.title}
                     </h2>
                     <p className="text-sm text-gray-500 mt-1 flex md:flex-row flex-col">
-                      {item.totalDuration && (
+                      {formatDuration(item.totalDuration) && (
                         <>
                           <span className="text-teal-700 text-sm">
-                            {item.totalDuration} hour long
+                            {formatDuration(item.totalDuration)} long
                           </span>
                           <span className="mx-2 text-gray-400 hidden lg:block">
                             •

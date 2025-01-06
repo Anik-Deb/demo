@@ -4,18 +4,19 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import axios from "axios";
 import { Loader2Icon } from "lucide-react";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { usePathname } from "next/navigation";
+import axios from "axios";
 
 export default function CheckoutButton({
   course,
   className,
   courseId,
-  userId,
   priceId,
   children,
   checked,
@@ -24,12 +25,17 @@ export default function CheckoutButton({
   course?: any;
   className?: string;
   courseId: string;
-  userId: string | null;
   priceId: string | null;
   children?: React.ReactNode;
   checked?: boolean;
 }) {
   const [isLoading, setIsLoading] = useState(false);
+  const { data: session, status } = useSession(); // Use session from NextAuth.js
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Get userId from session data
+  const userId = session?.user?.id || null;
 
   const onClick = async () => {
     try {
@@ -39,25 +45,19 @@ export default function CheckoutButton({
         course.prices.find((price) => price?.isFree === true)
       );
 
-      console.log("isFreeCourse", isFreeCourse);
-
       if (!isFreeCourse) {
-        // For aamarPay
-        // TODO: send priceId into payment API
         const response = await axios.post(`/api/courses/${courseId}/payment`, {
           priceId,
           teacherId: course?.teacherId,
         });
-        const result = window.location.assign(response.data.url);
+        window.location.assign(response.data.url);
       } else {
-        // For free course purchase
         const response = await axios.post(
           `/api/freecourse?courseId=${courseId}`,
           { userId }
         );
 
         if (response.data.success) {
-          // Redirect to lesson details page
           window.location.assign(
             `${process.env.NEXT_PUBLIC_APP_URL}/courses/${course.slug}/${course.lessons[0]?.slug}?success=1`
           );
@@ -73,6 +73,13 @@ export default function CheckoutButton({
     }
   };
 
+  // Use session data to determine user login state
+  useEffect(() => {
+    if (status === "authenticated" && !userId) {
+      router.refresh();
+    }
+  }, [status, userId, router]);
+
   return userId ? (
     <Button
       {...props}
@@ -84,7 +91,7 @@ export default function CheckoutButton({
       {children || <span>এনরোল করুন</span>}
     </Button>
   ) : (
-    <Link href="/signin">
+    <Link href={`/signin?redirect=${encodeURIComponent(pathname)}`}>
       <Button
         {...props}
         className="w-full flex bg-teal-600 text-white py-2 rounded mb-2"
