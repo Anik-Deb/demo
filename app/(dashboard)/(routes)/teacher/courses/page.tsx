@@ -26,6 +26,7 @@ const CoursesPage = async () => {
 
   return (
     <div className="p-6">
+      {/* {JSON.stringify(courses)}; */}
       <DataTable columns={columns} data={courses} />
     </div>
   );

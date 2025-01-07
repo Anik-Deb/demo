@@ -97,7 +97,7 @@ export async function POST(
       opt_b: price.id, // sent priceId here
     };
 
-    console.log("formData", formData);
+    // console.log("formData", formData);
 
     const paymentUrl = process.env.AAMARPAY_URL;
 

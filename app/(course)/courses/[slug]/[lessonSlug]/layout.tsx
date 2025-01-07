@@ -5,9 +5,12 @@ import { getCourseBySlug } from "@/actions/get-course-by-slug";
 import { getRelatedCourses } from "@/actions/get-related-courses";
 import { getServerUserSession } from "@/lib/getServerUserSession";
 import { getLesson } from "@/lib/utils/GetLessons";
-import RelatedCourse from "../_components/related-course";
-import StudentSidebar from "../_components/student-sidebar";
+// import RelatedCourse from "../_components/related-course";
+// import StudentSidebar from "../_components/student-sidebar";
 import { LessonProvider } from "@/lib/utils/LessonContext";
+import dynamic from "next/dynamic";
+const RelatedCourse = dynamic(() => import("../_components/related-course"));
+const StudentSidebar = dynamic(() => import("../_components/student-sidebar"));
 
 const Layout = async ({ children, params }) => {
   const { slug, lessonSlug } = params;
@@ -18,10 +21,10 @@ const Layout = async ({ children, params }) => {
     checkCourseAccess(slug, userId), // Course access data
     getCourseBySlug(slug, userId), // Course slug data
   ]);
-  if (lessonResponse.error) {
-    return <div>Lesson not found</div>;
+  if (lessonResponse.error || !accessResponse.access) {
+    redirect(`/courses/${slug}`); // Ensure consistent fallback or error display
   }
-  const { lesson, course, attachments, userProgress, purchase } =
+  const { lesson, course, attachments, nextLesson, userProgress, purchase } =
     lessonResponse.data;
 
   const hasCourseAccess = accessResponse.access;
@@ -42,7 +45,9 @@ const Layout = async ({ children, params }) => {
     userProgress,
     purchase,
     userId,
+    nextLesson,
   };
+
   return (
     <LessonProvider value={contextValue}>
       <div>

@@ -67,8 +67,9 @@ const URLInputForm: React.FC<{
       url
     );
   };
-
-  
+  const isVimeoVideo = (url: string) => {
+    return /vimeo\.com/.test(url);
+  };
 
   const getVideoDuration = async (videoUrl) => {
     setError("");
@@ -129,7 +130,7 @@ const URLInputForm: React.FC<{
 
           if (data && data.duration) {
             setDuration(data.duration);
-            return data.duration; 
+            return data.duration;
           } else {
             setError("Video not found.");
           }
@@ -168,11 +169,15 @@ const URLInputForm: React.FC<{
     setLoading(true);
     try {
       let videoDuration = await getVideoDuration(data?.videoUrl);
+      const trimmedVideoUrl = data.videoUrl.trim(); // Trim spaces from start and end
 
-      const result = await axios.patch(`/api/courses/${courseId}/lessons/${lessonId}`, {
-        videoUrl: data.videoUrl,
-        duration: videoDuration,
-      });
+      const result = await axios.patch(
+        `/api/courses/${courseId}/lessons/${lessonId}`,
+        {
+          videoUrl: trimmedVideoUrl,
+          duration: videoDuration,
+        }
+      );
       toast.success("Video URL updated successfully!");
       toggleEdit();
       router.refresh();
@@ -235,20 +240,35 @@ const URLInputForm: React.FC<{
               </div>
             </>
           ) : (
-            initialData?.videoUrl &&
-            isYoutubeVideo(initialData?.videoUrl) && (
-              <div className="relative aspect-video mt-2 ">
-                <iframe
-                  src={getVideoEmbed(initialData.videoUrl)}
-                  title="Video"
-                  width="100%"
-                  height="400px"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              </div>
-            )
+            <>
+              {initialData?.videoUrl &&
+                isYoutubeVideo(initialData?.videoUrl) && (
+                  <div className="relative aspect-video mt-2">
+                    <iframe
+                      src={getVideoEmbed(initialData.videoUrl)}
+                      title="YouTube Video"
+                      width="100%"
+                      height="400px"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  </div>
+                )}
+              {initialData?.videoUrl && isVimeoVideo(initialData?.videoUrl) && (
+                <div className="relative aspect-video mt-2">
+                  <iframe
+                    src={getVideoEmbed(initialData.videoUrl)}
+                    title="Vimeo Video"
+                    width="100%"
+                    height="400px"
+                    frameBorder="0"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                  ></iframe>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

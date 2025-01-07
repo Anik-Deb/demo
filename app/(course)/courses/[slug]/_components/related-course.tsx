@@ -12,6 +12,7 @@ export default function RelatedCourse({ courses }) {
   // console.log("related course page");
 
   return (
+
     <div className="my-12">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Related Courses</h1>
 
@@ -128,5 +129,6 @@ export default function RelatedCourse({ courses }) {
         </div>
       )}
     </div>
+    
   );
 }

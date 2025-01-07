@@ -152,7 +152,26 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      console.log("Successful payment and record created!");
+      // Fetch current student IDs
+      const currentCourse = await db.course.findUnique({
+        where: { id: courseId },
+        select: { studentIds: true },
+      });
+
+      // Ensure studentIds is an array and append user.id
+      const updatedStudentIds = Array.isArray(currentCourse.studentIds)
+        ? [...currentCourse.studentIds, user.id]
+        : [user.id];
+
+      // Update the course with the new student ID list
+      await db.course.update({
+        where: {
+          id: courseId,
+        },
+        data: {
+          studentIds: updatedStudentIds,
+        },
+      });
 
       // Return success response
       return NextResponse.redirect(

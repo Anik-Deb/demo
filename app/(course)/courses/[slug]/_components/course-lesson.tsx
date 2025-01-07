@@ -34,6 +34,8 @@ export default function CourseLesson({ course }) {
       setVisibleLessons(visibleLessonCount); // Show only the first 10 lessons
     }
   };
+
+
   return (
     <div className="my-6">
       <h1 className="text-2xl font-bold mb-4">Course Lessons</h1>

@@ -72,11 +72,11 @@ export const LessonDescriptionForm = ({
           data
         );
         router.refresh();
-        toast.success("TextContent updated successfully");
+        toast.success("Content updated successfully");
         setLoading(false);
         setIsEditing(false);
       } catch (error) {
-        console.error("Error updating TextContent:", error);
+        console.error("Error updating Content:", error);
         toast.error("Something went wrong");
         setLoading(false);
         
@@ -106,7 +106,7 @@ export const LessonDescriptionForm = ({
             !initialData.textContent && "text-slate-500 italic"
           )}
         >
-          {!initialData.textContent && "No description"}
+          {!initialData.textContent && "No Content Found"}
           {initialData.textContent && (
             <Preview value={initialData.textContent} />
           )}

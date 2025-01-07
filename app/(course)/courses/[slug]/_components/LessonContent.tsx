@@ -9,7 +9,6 @@ import { CourseProgressButton } from "../chapters/[chapterId]/_components/course
 import RatingForm from "./RatingForm";
 import { Preview } from "@/components/preview";
 import NotificationHandler from "@/components/notificationHandler/NotificationHandler";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import AuthorBio from "./author-bio";
 import Review from "./review";
 import MoreCourses from "./more-course";
@@ -19,26 +18,7 @@ import { useGetAllLessonsMutation } from "@/lib/redux/Actions/lessons";
 import StudentSidebar from "./student-sidebar";
 import { useLessonContext } from "@/lib/utils/LessonContext";
 import { Loader, Loader2Icon } from "lucide-react";
-
-const TabNavigation = ({ tabs, activeTab, onTabChange }) => {
-  return (
-    <div className="flex border-b border-gray-300">
-      {tabs.map((tab) => (
-        <button
-          key={tab.value}
-          className={`flex-1 py-3 transition duration-200 ${
-            activeTab === tab.value
-              ? "border-b-2 border-teal-700 text-teal-700"
-              : "text-gray-600 hover:text-teal-600 focus:outline-none"
-          }`}
-          onClick={() => onTabChange(tab.value)}
-        >
-          {tab.label}
-        </button>
-      ))}
-    </div>
-  );
-};
+import { TabNavigation } from "./details-tab-navigation";
 
 export const LessonContent = () => {
   const {
@@ -53,9 +33,13 @@ export const LessonContent = () => {
   } = useLessonContext();
 
   const [currentVideoUrl, setCurrentVideoUrl] = useState(lesson.videoUrl);
+  const [activeTab, setActiveTab] = useState("content");
+  const [notificationMessage, setNotificationMessage] = useState(null);
+  const [ratingValue, setRatingValue] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
   const isLocked = !lesson.isFree && !purchase;
   const completeOnEnd = !!purchase && !userProgress?.isCompleted;
-  const [activeTab, setActiveTab] = useState("content");
 
   const handleLessonChange = () => {
     setLoading(true); // Set loading state when lesson is being changed
@@ -84,23 +68,72 @@ export const LessonContent = () => {
     { label: "Rating", value: "rating" },
   ];
 
-  // State to manage the notification message
-  const [notificationMessage, setNotificationMessage] = useState(null);
+  // Fetch rating
+  useEffect(() => {
+    const fetchRating = async () => {
+      try {
+        const response = await fetch(
+          `/api/courses/ratings?courseId=${course.id}&userId=${userId}`
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Error fetching rating");
+        }
+
+        const ratingData = await response.json();
+        setRatingValue(ratingData.value || 0);
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch rating");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRating();
+  }, [course?.id, userId]);
+
+  // Handle rating submission and update local state
+  const handleRatingSubmit = async (newRating: number) => {
+    try {
+      const response = await fetch("/api/courses/ratings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          value: newRating,
+          courseId: course?.id,
+          userId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Error submitting rating");
+      }
+
+      setRatingValue(newRating); // Update the local state with the new rating
+    } catch (error) {
+      // Handle submission error if needed
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     // Determine message based on URL parameters
     if (success) {
-      setNotificationMessage("Course purchase completed successfully");
+      setNotificationMessage("Enrollment successful!");
     } else if (canceled) {
-      setNotificationMessage("Course purchase canceled");
+      setNotificationMessage("Enrollment canceled");
     } else if (failed) {
-      setNotificationMessage("Course purchase failed");
+      setNotificationMessage("Enrollment failed");
     } else {
       setNotificationMessage(null); // No message if parameters do not match
     }
   }, [success, canceled, failed]);
 
-  // Function to extract video ID from different YouTube URL formats
+  // Function to extract video ID from different YouTube URLs formats
   const getYouTubeVideoId = (url: string) => {
     const youtubeRegex =
       /(?:youtu\.be\/|youtube\.com\/(?:[^\/]+\/[^\/]+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=))([^"&?\/\s]{11})/;
@@ -138,13 +171,13 @@ export const LessonContent = () => {
         ) : (
           <div className="transition-opacity duration-700 ease-in-out opacity-100">
             {currentVideoUrl && (
-              <div className="mb-4 mb-4 transition-opacity duration-700 ease-in-out opacity-100">
+              <div className="mb-4 transition-opacity duration-700 ease-in-out opacity-100">
                 {
                   // Check the type of video URL and render the appropriate player
                   isYouTubeVideo && youtubeVideoId ? (
                     <div className="aspect-w-16 aspect-h-9 relative">
                       <iframe
-                        src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&mute=1`}
+                        src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1&mute=1&rel=0&modestbranding=1&showinfo=0`}
                         title="YouTube Video"
                         frameBorder="0"
                         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
@@ -235,7 +268,12 @@ export const LessonContent = () => {
                 )}
 
                 {activeTab === "rating" && (
-                  <RatingForm courseId={course?.id} userId={userId} />
+                  <RatingForm
+                    courseId={course?.id}
+                    userId={userId}
+                    initialRating={ratingValue}
+                    onRatingSubmit={handleRatingSubmit}
+                  />
                 )}
               </div>
             </div>

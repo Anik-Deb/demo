@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -5,7 +6,7 @@ import { Course, Lesson } from "@prisma/client";
 import axios from "axios";
 import { Loader, PlusCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import * as z from "zod";
@@ -42,6 +43,8 @@ export const LessonsForm = ({ initialData, courseId }: LessonsFormProps) => {
   const [isCreating, setIsCreating] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [loading, setLoading] = useState(false);
+
+ 
 
   const toggleCreating = () => {
     setIsCreating((current) => !current);
@@ -95,6 +98,8 @@ export const LessonsForm = ({ initialData, courseId }: LessonsFormProps) => {
   const onEdit = (id: string) => {
     router.push(`/teacher/courses/${courseId}/lessons/${id}`);
   };
+ 
+
 
   return (
     <div className="relative mt-6 border bg-slate-100 rounded-md p-4">

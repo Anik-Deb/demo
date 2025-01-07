@@ -26,9 +26,13 @@ const StudentSidebarLessons = ({
   return (
     <div className="bg-white">
       <div
-        className={`cursor-pointer flex items-start gap-2 py-3 rounded-md transition-all hover:text-teal-700 ${
+        className={`cursor-pointer flex items-start gap-2 py-3 rounded-md transition-all ${
           !isLast ? "border-b border-gray-100" : ""
-        } ${isActive ? "text-teal-700 font-semibold" : "text-gray-600"}`}
+        } ${
+          item.slug === lessonSlug
+            ? "text-teal-700 font-semibold"
+            : "text-gray-600"
+        }`}
         onClick={handlePlayClick}
       >
         {item.videoUrl !== null ? (
@@ -44,7 +48,11 @@ const StudentSidebarLessons = ({
             }`}
           />
         )}
-        <div className="text-sm flex gap-2">
+        <div
+          className={`text-sm flex gap-2 ${
+            item.slug === lessonSlug ? "text-teal-500" : ""
+          }`}
+        >
           <p
             className="text-sm capitalize"
             dangerouslySetInnerHTML={{

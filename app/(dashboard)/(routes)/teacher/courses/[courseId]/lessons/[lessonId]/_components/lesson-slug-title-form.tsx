@@ -1,3 +1,4 @@
+// @ts-nocheck
 "use client";
 
 import * as z from "zod";
@@ -5,7 +6,7 @@ import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Pencil } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import {
@@ -47,6 +48,33 @@ export const LessonSlugTitleForm = ({
 }: LessonSlugTitleFormProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false); // State for loading
+  const [enrolledStudents, setEnrolledStudents] = useState(0);
+  useEffect(() => {
+    const getEnrolledStudents = async () => {
+      setLoading(true);
+      try {
+        const count = await fetchEnrolledStudents(courseId);
+        setEnrolledStudents(count);
+      } catch (error) {
+        console.error("Failed to fetch enrolled students:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getEnrolledStudents();
+  }, [courseId]);
+
+  // app\api\courses\[courseId]\student\route.ts
+  const fetchEnrolledStudents = async (courseId) => {
+    try {
+      const response = await axios.get(`/api/courses/${courseId}/student`);
+      return response.data.enrolledStudents;
+    } catch (error) {
+      console.error("Error fetching enrolled students:", error);
+      throw error; // Re-throw the error for further handling if necessary
+    }
+  };
 
   const toggleEdit = () => setIsEditing((current) => !current);
   const router = useRouter();
@@ -58,27 +86,26 @@ export const LessonSlugTitleForm = ({
 
   const { isSubmitting, isValid } = form.formState;
 
-const onSubmit = async (values: z.infer<typeof formSchema>) => {
-  setLoading(true); // Set loading to true
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setLoading(true); // Set loading to true
 
-  try {
-    await axios.patch(`/api/courses/${courseId}/lessons/${lessonId}`, values);
+    try {
+      await axios.patch(`/api/courses/${courseId}/lessons/${lessonId}`, values);
 
-    toast.success("Lesson updated");
-    toggleEdit();
-    router.refresh();
-  } catch (error) {
-    // Ensure error is defined and has a response
-    if (axios.isAxiosError(error) && error.response?.status === 500) {
-      toast.error("This slug is preoccupied. Please use a different slug.");
-    } else {
-      toast.error("Something went wrong");
+      toast.success("Lesson updated");
+      toggleEdit();
+      router.refresh();
+    } catch (error) {
+      // Ensure error is defined and has a response
+      if (axios.isAxiosError(error) && error.response?.status === 500) {
+        toast.error("This slug is preoccupied. Please use a different slug.");
+      } else {
+        toast.error("Something went wrong");
+      }
+    } finally {
+      setLoading(false); // Reset loading state
     }
-  } finally {
-    setLoading(false); // Reset loading state
-  }
-};
-
+  };
 
   return (
     <div className="mt-6 border bg-slate-100 rounded-md p-4">
@@ -109,7 +136,7 @@ const onSubmit = async (values: z.infer<typeof formSchema>) => {
                 <FormItem>
                   <FormControl>
                     <Input
-                      disabled={isSubmitting || loading} // Disable if loading
+                      disabled={isSubmitting || loading || enrolledStudents} // Disable if loading
                       placeholder="e.g. 'introduction-to-the-course'"
                       {...field}
                     />

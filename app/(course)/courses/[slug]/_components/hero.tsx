@@ -34,7 +34,7 @@ export default function Hero({ course, ratingData }) {
             dangerouslySetInnerHTML={{
               __html: course?.description
                 ? course?.description.slice(0, 140) +
-                  (course?.description.length > 140 ? "..." : "")
+                  (course?.description.length > 140 ? "" : "")
                 : "No Description Found",
             }}
           />

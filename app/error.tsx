@@ -10,7 +10,7 @@ const ErrorPage = ({ error, reset }) => {
         <p className="text-lg text-gray-600 mb-6">
           Something went wrong. Please try again.
         </p>
-        <p className="text-red-500 mb-4">{error?.message}</p>
+        {/* <p className="text-red-500 mb-4">{error?.message}</p> */}
         <button
           onClick={reset}
           className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-lg hover:bg-teal-700 transition duration-200"

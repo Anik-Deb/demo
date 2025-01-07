@@ -18,9 +18,9 @@ export default function CategoryLayout({
 }) {
   return (
     <div>
-      <Header />
+      {/* <Header /> */}
       {children}
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

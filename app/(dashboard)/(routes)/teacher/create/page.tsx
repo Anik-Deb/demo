@@ -70,8 +70,12 @@ const CreatePage = () => {
       const response = await axios.post("/api/courses", values);
       router.push(`/teacher/courses/${response.data.id}`);
       toast.success("Course created");
-    } catch {
-      toast.error("Something went wrong");
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 500) {
+        toast.error("This slug is preoccupied. Please use a different slug.");
+      } else {
+        toast.error("Something went wrong");
+      }
     }
   };
 
