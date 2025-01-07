@@ -78,7 +78,7 @@ export const CourseProgressButton = ({
 
       if (response?.data?.isCompleted == false) {
         toast.success("Progress updated");
-        // router.refresh();
+        router.refresh();
         return;
       }
 

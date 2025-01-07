@@ -1,10 +1,10 @@
 // @ts-nocheck
-"use client";
+// "use client";
 import Link from "next/link";
 import { CourseProgress } from "./course-progress";
 import { Button } from "@/components/ui/button";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+// import { useEffect } from "react";
+// import { useRouter } from "next/navigation";
 
 export const SingleCardButton = ({
   isAuthenticated,
@@ -14,7 +14,7 @@ export const SingleCardButton = ({
   lessons,
   loading
 }) => {
-  const router = useRouter();
+  // const router = useRouter();
   // useEffect(() => {
   //   if (isAuthenticated) {
   //     router.refresh();

@@ -54,7 +54,9 @@ export default async function CoursePage({ params }) {
               <CourseLesson course={course} access={access} />
               <Requirements course={course} />
               <CourseDescription course={course} />
-              <RelatedCourse courses={relatedCourses} />
+              {relatedCourses.length && (
+                <RelatedCourse courses={relatedCourses} />
+              )}
             </main>
           </div>
           <div className="flex-initial w-full relative lg:w-96 z-10">

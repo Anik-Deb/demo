@@ -29,7 +29,7 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
     orderBy: {
       name: "asc",
     },
-  }); 
+  });
   if (!categories) {
     redirect("/dashboard");
   }
